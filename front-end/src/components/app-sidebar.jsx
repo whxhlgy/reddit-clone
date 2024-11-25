@@ -1,17 +1,5 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
-import { ChevronDown, Home, Plus, Telescope, Users } from "lucide-react";
-import { Link } from "react-router";
+import CreateCommunityForm from "@/components/create-community-form";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,16 +8,24 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { getCookie } from "@/utils/cookies";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import CreateCommunityForm from "@/components/create-community-form";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+import { ChevronDown, Home, Plus, Telescope, Users } from "lucide-react";
+import React from "react";
+import { Link } from "react-router-dom";
 
 // Menu items.
 const items = [
@@ -45,15 +41,7 @@ const items = [
   },
 ];
 
-const communities = [
-  {
-    title: "webdev",
-    url: "r/webdev",
-    icon: Users,
-  },
-];
-
-export function AppSidebar() {
+export default function AppSidebar({ communities }) {
   return (
     <Sidebar className="top-[--header-height]" variant="sidebar">
       <SidebarContent>
@@ -87,23 +75,14 @@ export function AppSidebar() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline">
-                            <Plus />
-                            <span>Create a community</span>
-                          </Button>
-                        </DialogTrigger>
-                        <CreateCommunityDialog />
-                      </Dialog>
+                      <CreateCommunityDialog />
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  {communities.map((item) => (
-                    <SidebarMenuItem key={item.title}>
+                  {communities.map((community) => (
+                    <SidebarMenuItem key={community.name}>
                       <SidebarMenuButton asChild>
-                        <Link to={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
+                        <Link to={community.name}>
+                          <span>{community.name}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -118,21 +97,29 @@ export function AppSidebar() {
   );
 }
 
-function InputField({ label, name, id }) {
-  return (
-    <div className="grid w-full max-w-sm items-center gap-3">
-      <Label htmlFor={id}>{label}</Label>
-      <Input name={name} id={id} />
-    </div>
-  );
-}
 function CreateCommunityDialog() {
+  const [open, setOpen] = React.useState(false);
+
+  const closeDialog = () => {
+    setOpen(false);
+  };
+
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle className="mb-4">Tell us about your community</DialogTitle>
-        <CreateCommunityForm />
-      </DialogHeader>
-    </DialogContent>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Plus />
+          <span>Create a community</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="mb-4">
+            Tell us about your community
+          </DialogTitle>
+          <CreateCommunityForm closeDialog={closeDialog} />
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   );
 }

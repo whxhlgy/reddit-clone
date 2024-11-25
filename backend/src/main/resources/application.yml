@@ -5,6 +5,10 @@ spring:
     url: 'jdbc:mysql://127.0.0.1:3306/reddit'
     username: 'root'
     password: ''
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
   sql:
     init:
       mode: always

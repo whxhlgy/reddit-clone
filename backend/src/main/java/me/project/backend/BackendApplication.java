@@ -1,7 +1,7 @@
 package me.project.backend;
 
-import me.project.backend.mapper.CommunityMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.project.backend.domain.Community;
+import me.project.backend.repository.CommunityRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication implements CommandLineRunner {
 
-    private final CommunityMapper communityMapper;
+    private final CommunityRepository communityRepository;
 
-    public BackendApplication(CommunityMapper communityMapper) {
-        this.communityMapper = communityMapper;
+    public BackendApplication(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
     }
 
     public static void main(String[] args) {
@@ -21,6 +21,6 @@ public class BackendApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println(this.communityMapper.findById("1"));
+        communityRepository.save(new Community("webdev", "test_desc"));
     }
 }
