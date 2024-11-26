@@ -6,6 +6,7 @@ import Layout, {
   loader as layoutLoader,
 } from "@/app/layout";
 import Home from "@/app/home";
+import ErrorPage from "@/app/error-page";
 
 const router = createBrowserRouter([
   {
@@ -13,16 +14,22 @@ const router = createBrowserRouter([
     path: "/",
     loader: layoutLoader,
     action: layoutAction,
+    errorElement: <ErrorPage />,
     children: [
       {
-        index: true,
-        element: <Home />,
-        // children: [
-        //   {
-        //     path: "explore",
-        //     element:
-        //   }
-        // ]
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            element: <Home />,
+            // children: [
+            //   {
+            //     path: "explore",
+            //     element:
+            //   }
+            // ]
+          },
+        ],
       },
     ],
   },

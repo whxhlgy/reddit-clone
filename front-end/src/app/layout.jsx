@@ -4,15 +4,26 @@ import Header from "@/components/app-header";
 import { Outlet } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import { getAllCommunities, createCommunity } from "@/api/community";
+import { toast, Toaster } from "sonner";
 
 export async function loader() {
-  return getAllCommunities();
+  try {
+    const res = await getAllCommunities();
+    return res;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }
 
 export async function action({ request }) {
-  const body = await request.json();
-  const res = await createCommunity(body);
-  console.log(res);
+  try {
+    const body = await request.json();
+    const res = await createCommunity(body);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to create community");
+  }
 }
 
 const Layout = () => {
@@ -21,6 +32,7 @@ const Layout = () => {
     <>
       <SidebarProvider>
         <Header />
+        <Toaster position="top-center" richColors />
         <AppSidebar communities={communities} />
         <main className="bg-red-100 relative z-0 top-[--header-height] scroll-mt-[--header-height]">
           <div className="flex flex-col justify-start">
