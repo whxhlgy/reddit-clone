@@ -1,7 +1,7 @@
 package me.project.backend.controller;
 
 import me.project.backend.domain.Community;
-import me.project.backend.repository.CommunityRepository;
+import me.project.backend.service.CommunityService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,20 +9,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/communities")
 public class CommunityController {
-    private final CommunityRepository communityRepository;
+    private final CommunityService communityService;
 
-    public CommunityController(CommunityRepository communityRepository) {
-        this.communityRepository = communityRepository;
+    public CommunityController(CommunityService communityService) {
+        this.communityService = communityService;
     }
 
     @GetMapping
-    public List<Community> getAll() {
-        return communityRepository.findAll();
+    public List<Community> findAll() {
+        return communityService.findAll();
     }
 
     @PostMapping
-    public Community addCommunity(@RequestBody Community community) {
-        communityRepository.save(community);
-        return community;
+    public Community save(@RequestBody Community community) {
+        return communityService.save(community);
     }
 }

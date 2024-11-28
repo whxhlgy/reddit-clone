@@ -20,9 +20,11 @@ export async function action({ request }) {
   try {
     const body = await request.json();
     const res = await createCommunity(body);
+    return { ok: true };
   } catch (error) {
     console.error(error);
     toast.error("Failed to create community");
+    return { ok: false, error };
   }
 }
 

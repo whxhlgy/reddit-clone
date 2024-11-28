@@ -12,7 +12,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useSubmit } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 const CreateCommunityForm = ({ closeDialog }) => {
   const formSchema = z.object({
@@ -35,15 +37,35 @@ const CreateCommunityForm = ({ closeDialog }) => {
     },
   });
 
-  const submit = useSubmit();
+  // const submit = useSubmit();
+  const fetcher = useFetcher();
+  const { data, state } = fetcher;
 
-  const onSubmit = (value) => {
-    submit(value, {
+  const onSubmit = async (value) => {
+    await fetcher.submit(value, {
       method: "post",
       encType: "application/json",
     });
-    closeDialog();
   };
+
+  useEffect(() => {
+    if (state === "idle" && data?.ok) {
+      closeDialog();
+    } else if (state === "idle" && data?.ok === false) {
+      if (data.error.status === 409) {
+        form.setError(
+          "name",
+          {
+            type: "manual",
+            message: "Name already exist",
+          },
+          {
+            shouldFocus: true,
+          },
+        );
+      }
+    }
+  }, [state, data]);
 
   return (
     <Form {...form}>
@@ -78,7 +100,10 @@ const CreateCommunityForm = ({ closeDialog }) => {
             )}
           />
         </div>
-        <Button type="submit">Submit</Button>
+        <Button {...(state !== "idle" && { disabled: true })} type="submit">
+          {state !== "idle" && <Loader2 className="animate-spin" />}
+          {state === "idle" ? "Sumbit" : "Sumbitting..."}
+        </Button>
       </form>
     </Form>
   );

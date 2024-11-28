@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity(name = "community")
+@Table(indexes = @Index(columnList = "name", unique = true))
 @Data
 @NoArgsConstructor
 public class Community {

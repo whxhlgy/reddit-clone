@@ -16,7 +16,7 @@ class CommunityControllerTest {
 
     @Test
     void getCommunityList() {
-        List<Community> communities = communityController.getAll();
+        List<Community> communities = communityController.findAll();
         System.out.println(communities);
         assertThat(communities).isNotNull();
     }
@@ -26,7 +26,7 @@ class CommunityControllerTest {
         Community community = new Community();
         community.setName("test");
         community.setDescription("test");
-        Community added = communityController.addCommunity(community);
+        Community added = communityController.save(community);
         assertThat(added).isNotNull();
         System.out.println(added);
     }
