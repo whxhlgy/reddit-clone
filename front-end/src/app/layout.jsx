@@ -36,8 +36,8 @@ const Layout = () => {
         <Header />
         <Toaster position="top-center" richColors />
         <AppSidebar communities={communities} />
-        <main className="bg-red-100 relative z-0 top-[--header-height] scroll-mt-[--header-height]">
-          <div className="flex flex-col justify-start">
+        <main className="relative w-full z-0 top-[--header-height] scroll-mt-[--header-height] px-4 py-2 flex justify-center items-start">
+          <div className="max-w-screen-xl flex-grow flex justify-center items-start">
             <Outlet />
           </div>
         </main>

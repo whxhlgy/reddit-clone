@@ -1,11 +1,12 @@
-import "./App.css";
-import { HEADER_HEIGHT } from "@/utils/consts";
+import { HEADER_HEIGHT } from "@/lib/consts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout, {
   action as layoutAction,
   loader as layoutLoader,
 } from "@/app/layout";
 import Home from "@/app/home";
+import "./App.css";
+import CommunityHome, { loader as communityLoader } from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
 
 const router = createBrowserRouter([
@@ -22,12 +23,11 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <Home />,
-            // children: [
-            //   {
-            //     path: "explore",
-            //     element:
-            //   }
-            // ]
+          },
+          {
+            loader: communityLoader,
+            path: "r/:communityName",
+            element: <CommunityHome />,
           },
         ],
       },
