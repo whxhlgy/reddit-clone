@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { COMMUNITY_URL } from "@/lib/consts";
 import { ChevronDown, Home, Plus, Telescope, Users } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -81,7 +82,7 @@ export default function AppSidebar({ communities }) {
                   {communities.map((community) => (
                     <SidebarMenuItem key={community.name}>
                       <SidebarMenuButton asChild>
-                        <Link to={community.name}>
+                        <Link to={"/" + COMMUNITY_URL + "/" + community.name}>
                           <span>{community.name}</span>
                         </Link>
                       </SidebarMenuButton>

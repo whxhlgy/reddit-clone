@@ -9,6 +9,7 @@ export async function get(endpoint) {
 }
 
 export async function post(endpoint, data) {
+  console.log(`send data to ${endpoint}, data: ${data}`);
   const response = await fetch(endpoint, {
     method: "POST",
     body: JSON.stringify(data),

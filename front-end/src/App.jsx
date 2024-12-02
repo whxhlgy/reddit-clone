@@ -6,8 +6,12 @@ import Layout, {
 } from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
-import CommunityHome, { loader as communityLoader } from "@/app/community/home";
+import CommunityHome, {
+  action as feedAction,
+  loader as communityLoader,
+} from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
+import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
 
 const router = createBrowserRouter([
   {
@@ -26,8 +30,14 @@ const router = createBrowserRouter([
           },
           {
             loader: communityLoader,
+            action: feedAction,
             path: "r/:communityName",
             element: <CommunityHome />,
+          },
+          {
+            path: "r/:communityName/submit",
+            element: <Submit />,
+            loader: feedSubmitLoader,
           },
         ],
       },

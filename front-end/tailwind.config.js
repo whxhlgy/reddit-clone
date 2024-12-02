@@ -11,6 +11,9 @@ export default {
       },
       colors: {
         background: "hsl(var(--background))",
+        feed: {
+          background: "rgb(249, 250, 251)",
+        },
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -34,6 +37,18 @@ export default {
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        accent1: {
+          DEFAULT: "hsl(var(--accent-1))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        accent2: {
+          DEFAULT: "hsl(var(--accent-2))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        accent3: {
+          DEFAULT: "hsl(var(--accent-3))",
           foreground: "hsl(var(--accent-foreground))",
         },
         deeper: {

@@ -1,8 +1,9 @@
-import PostCard from "@/components/post-card";
+import PostCard, { PostCardWrapper } from "@/components/post-card";
 
 const Feed = ({ posts }) => {
+  console.log(posts);
   return (
-    <div className="w-full">
+    <div>
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
