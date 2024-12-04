@@ -1,6 +1,7 @@
 package me.project.backend.service;
 
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Post;
 import me.project.backend.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Log
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
 
@@ -21,7 +22,7 @@ public class PostService {
     }
 
     public Post save(Post post) {
-        log.info("save post: " + post);
+        log.info("save post: {}", post);
         return postRepository.save(post);
     }
 }

@@ -12,8 +12,13 @@ import CommunityHome, {
 } from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
 import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
+import { default as LoginPage } from "@/app/login/page";
 
 const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
   {
     element: <Layout />,
     path: "/",
@@ -26,6 +31,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
+            path: "home",
             element: <Home />,
           },
           {

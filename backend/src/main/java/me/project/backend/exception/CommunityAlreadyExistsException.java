@@ -1,7 +1,15 @@
 package me.project.backend.exception;
 
-public class CommunityAlreadyExistsException extends RuntimeException {
-    public CommunityAlreadyExistsException() {
-        super("The community already exists!");
+import org.springframework.http.HttpStatus;
+
+public class CommunityAlreadyExistsException extends ServiceException {
+
+    public CommunityAlreadyExistsException(String message) {
+        super(message);
+    }
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.CONFLICT;
     }
 }

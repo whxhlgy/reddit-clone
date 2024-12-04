@@ -1,6 +1,7 @@
 import SearchInput from "@/components/search-input";
 import Logo from "/reddit.svg";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Header = () => {
   return (
@@ -11,7 +12,13 @@ const Header = () => {
           <img src={Logo} alt="Reddit Logo" className="h-16" />
         </div>
         <SearchInput />
-        <div>User</div>
+
+        {/* right section */}
+        <div>
+          <Avatar>
+            <AvatarFallback>ZJ</AvatarFallback>
+          </Avatar>
+        </div>
       </nav>
     </header>
   );
