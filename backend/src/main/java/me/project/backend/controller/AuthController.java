@@ -1,6 +1,8 @@
 package me.project.backend.controller;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.payload.request.RefreshTokenRequest;
 import me.project.backend.payload.response.JwtResponse;
@@ -23,16 +25,26 @@ public class AuthController {
         this.authService = authService;
     }
 
+    private static void addTokenInCookie(HttpServletResponse response, JwtResponse login) {
+        Cookie cookie = new Cookie("refresh_token", login.getRefreshToken());
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+    }
+
     @PostMapping("/login")
-    public JwtResponse login(@RequestBody LoginRequest loginRequest){
+    public JwtResponse login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         log.debug("login request: {}", loginRequest.toString());
-        return authService.login(loginRequest);
+        JwtResponse login = authService.login(loginRequest);
+        addTokenInCookie(response, login);
+        return login;
     }
 
     @PostMapping("/signup")
-    public JwtResponse signUp(@RequestBody SignupRequest signupRequest) {
+    public JwtResponse signUp(@RequestBody SignupRequest signupRequest, HttpServletResponse response) {
         log.debug("signup request: {}", signupRequest.toString());
-        return authService.signup(signupRequest);
+        JwtResponse signup = authService.signup(signupRequest);
+        addTokenInCookie(response, signup);
+        return signup;
     }
 
     @PostMapping("/refreshtoken")

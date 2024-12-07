@@ -1,5 +1,6 @@
 package me.project.backend.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,6 @@ public class JwtResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
-    @JsonProperty("refresh_token")
+    @JsonIgnore
     private String refreshToken;
 }
