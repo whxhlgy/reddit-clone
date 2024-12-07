@@ -4,15 +4,20 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.User;
 import me.project.backend.exception.auth.UserAlreadyExistsException;
+import me.project.backend.payload.UserDetailsImpl;
+import me.project.backend.payload.request.RefreshTokenRequest;
 import me.project.backend.payload.response.JwtResponse;
-import me.project.backend.payload.response.request.LoginRequest;
-import me.project.backend.payload.response.request.SignupRequest;
+import me.project.backend.payload.request.LoginRequest;
+import me.project.backend.payload.request.SignupRequest;
+import me.project.backend.payload.response.RefreshTokenResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -36,7 +41,8 @@ public class AuthService {
         // generate jwt token for this user
         log.debug("Get authentication success: {}", authentication);
         String jwtToken = jwtService.generateJwtToken(authentication);
-        return new JwtResponse(jwtToken);
+        String jwtRefreshToken = jwtService.generateRefreshToken(authentication);
+        return new JwtResponse(jwtToken, jwtRefreshToken);
     }
 
     /**
@@ -54,5 +60,20 @@ public class AuthService {
         }
 
         return login(new LoginRequest(signupRequest.getUsername(), signupRequest.getPassword()));
+    }
+
+    public RefreshTokenResponse refreshToken(@Valid RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        log.debug("Refresh token: {}", refreshToken);
+
+        // validate the token, if the token is invalid, this will throw an exception
+        jwtService.validateToken(refreshToken);
+
+        String username = jwtService.extractUsername(refreshToken);
+        // this is a token with isAuthenticated()==true
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl(username, null), null, List.of());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwtToken = jwtService.generateJwtToken(authentication);
+        return new RefreshTokenResponse(jwtToken);
     }
 }

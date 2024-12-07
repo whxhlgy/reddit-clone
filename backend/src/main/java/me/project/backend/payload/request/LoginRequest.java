@@ -1,13 +1,12 @@
-package me.project.backend.payload.response.request;
+package me.project.backend.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-public class SignupRequest {
+@AllArgsConstructor
+public class LoginRequest {
     @NotBlank
     private String username;
     @NotBlank
