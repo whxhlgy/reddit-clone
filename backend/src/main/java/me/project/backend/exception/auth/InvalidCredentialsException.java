@@ -5,7 +5,12 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidCredentialsException extends ServiceException {
   public InvalidCredentialsException() {
-    super("The user is not authenticated because their credentials are invalid");
+    super("Username or password is not correct");
+  }
+
+  @Override
+  public String getErrorCode() {
+    return "BAD_CREDENTIALS";
   }
 
   @Override

@@ -1,4 +1,4 @@
-import { Link, useFetcher } from "react-router-dom";
+import { Link, redirect, useFetcher } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,21 +13,25 @@ import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 
 export function LoginForm() {
   const fetcher = useFetcher();
   const formSchema = z.object({
-    username: z
-      .string()
-      .min(2, { message: "username must at least 2 characters" })
-      .max(20),
-    password: z.string().min(1),
+    username: z.string().min(2).max(20, {
+      message: "username too long(20)",
+    }),
+    password: z.string().min(1).max(20, {
+      message: "password too long(20)",
+    }),
   });
 
   const {
     register,
     formState: { errors },
     handleSubmit,
+    setValue,
+    setFocus,
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,9 +40,25 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = (value: z.infer<typeof formSchema>) => {
-    console.log(value);
+  // login submit
+  const onSubmit = async (value: z.infer<typeof formSchema>) => {
+    await fetcher.submit(value, {
+      method: "post",
+      encType: "application/json",
+    });
   };
+
+  useEffect(() => {
+    if (fetcher.data) {
+      if (!fetcher.data.ok) {
+        const errorCode = fetcher.data.errorCode;
+        if (errorCode === "BAD_CREDENTIALS") {
+          setValue("password", "");
+          setFocus("password");
+        }
+      }
+    }
+  }, [fetcher.data]);
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -56,12 +76,11 @@ export function LoginForm() {
               id="username"
               type="username"
               placeholder="m@example.com"
+              required
               {...register("username")}
             />
             {errors.username && (
-              <p className="text-[0.8rem] font-medium text-destructive">
-                {errors.username?.message}
-              </p>
+              <p className="error-message">{errors.username?.message}</p>
             )}
           </div>
           <div className="grid gap-2">
@@ -81,6 +100,9 @@ export function LoginForm() {
               required
               {...register("password")}
             />
+            {errors.password && (
+              <p className="error-message">{errors.password?.message}</p>
+            )}
           </div>
           <Button type="submit" className="w-full">
             Login

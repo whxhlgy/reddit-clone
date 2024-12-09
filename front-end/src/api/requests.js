@@ -1,15 +1,24 @@
 export async function get(endpoint) {
-  const response = await fetch(endpoint);
-  if (!response.ok) {
-    throw new Response("Get failed", {
-      status: response.status,
-    });
+  console.debug(`request to ${endpoint}`);
+  const options = {
+    method: "GET",
+  };
+
+  const accessToken = localStorage.getItem("access_token");
+  if (accessToken) {
+    options.headers = options.headers || {};
+    options.headers["Authorization"] = `Bearer ${accessToken}`;
   }
-  return response;
+
+  const response = await fetch(endpoint, options);
+  if (!response.ok) {
+    throw new Error("Get failed");
+  }
+  return response.json();
 }
 
 export async function post(endpoint, data) {
-  console.log(`send data to ${endpoint}, data: ${data}`);
+  console.debug(`Post to ${endpoint}, data: ${JSON.stringify(data)}`);
   const response = await fetch(endpoint, {
     method: "POST",
     body: JSON.stringify(data),
@@ -18,9 +27,8 @@ export async function post(endpoint, data) {
     },
   });
   if (!response.ok) {
-    throw new Response("Post failed", {
-      status: response.status,
-    });
+    const errorDetails = await response.json();
+    throw errorDetails;
   }
-  return response;
+  return response.json();
 }

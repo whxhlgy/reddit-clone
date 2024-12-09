@@ -144,3 +144,9 @@ button {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .error-message {
+    @apply text-[0.8rem] font-medium text-destructive;
+  }
+}

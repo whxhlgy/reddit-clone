@@ -3,6 +3,7 @@ package me.project.backend.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.User;
 import me.project.backend.exception.auth.RefreshTokenNotValidException;
@@ -71,14 +72,22 @@ public class JwtService {
         return claimsJws.getPayload().getSubject();
     }
 
-    public void validateToken(String jwtToken) {
+    public boolean validateToken(String jwtToken) {
         try {
-            Jwts.parser()
-                    .verifyWith(getSecretKey())
-                    .build()
-                    .parse(jwtToken);
-        } catch (ExpiredJwtException | MalformedJwtException | SecurityException | IllegalArgumentException e) {
-            throw new RefreshTokenNotValidException(e.getMessage());
+            Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(jwtToken);
+            return true;
+        } catch (SignatureException e) {
+            log.error("Invalid signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Invalid token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("claims string is empty: {}", e.getMessage());
         }
+        return false;
     }
+
 }

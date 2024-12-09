@@ -8,4 +8,8 @@ public abstract class ServiceException extends RuntimeException {
     }
 
     public abstract HttpStatus getHttpStatus();
+
+    public String getErrorCode() {
+        return null;
+    }
 }

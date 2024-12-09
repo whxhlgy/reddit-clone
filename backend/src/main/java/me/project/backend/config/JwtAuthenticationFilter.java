@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import me.project.backend.exception.auth.BadJwtTokenException;
 import me.project.backend.service.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,25 +42,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response); // do nothing
             return;
         }
+        final String jwtToken = authHeader.substring(7);
+
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new BadJwtTokenException(jwtToken);
+        }
 
         try {
-            final String jwt = authHeader.substring(7);
-            // verify the token
-            String username = jwtService.extractUsername(jwt);
+            String username = jwtService.extractUsername(jwtToken);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             // this is a token with isAuthenticated()==true
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        } catch (ExpiredJwtException expiredJwtException) {
-            log.error(expiredJwtException.getMessage());
-            // TODO
+            log.debug("Authoring completed");
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
+            log.error(e.getMessage());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
-        log.debug("Authoring completed");
-        filterChain.doFilter(request, response);
     }
 }

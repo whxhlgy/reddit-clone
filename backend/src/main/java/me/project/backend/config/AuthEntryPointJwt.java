@@ -29,6 +29,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         if (authException instanceof BadCredentialsException) {
             message = "Bad credentials";
         }
+        log.debug("message: {}", message);
         response.sendError(HttpStatus.UNAUTHORIZED.value(), message);
     }
 }

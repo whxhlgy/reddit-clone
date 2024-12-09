@@ -23,7 +23,12 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
     public ErrorResponse error(WebRequest request) {
+        log.debug("Process error request");
         Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, ErrorAttributeOptions.defaults());
-        return new ErrorResponse((Integer) attributes.get("status"), (String) attributes.get("error"));
+        log.debug(attributes.toString());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(attributes.get("error").toString());
+        errorResponse.setStatus((Integer) attributes.get("status"));
+        return errorResponse;
     }
 }

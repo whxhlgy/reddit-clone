@@ -12,11 +12,13 @@ import CommunityHome, {
 } from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
 import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
-import { default as LoginPage } from "@/app/login/page";
+import { action as loginAction, default as LoginPage } from "@/app/auth/login";
+import { Toaster } from "@/components/ui/sonner";
 
 const router = createBrowserRouter([
   {
     path: "/login",
+    action: loginAction,
     element: <LoginPage />,
   },
   {
@@ -62,6 +64,7 @@ function App() {
         "--header-height": HEADER_HEIGHT,
       }}
     >
+      <Toaster position="top-center" richColors />
       <RouterProvider router={router} />
     </div>
   );
