@@ -3,6 +3,8 @@ package me.project.backend.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +18,9 @@ import java.util.List;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,10 +43,5 @@ public class User {
     @UpdateTimestamp
     @Column(name = "update_at")
     private LocalDateTime updateAt;
-
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
 }

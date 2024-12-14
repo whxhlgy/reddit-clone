@@ -26,7 +26,7 @@ class UserDetailServiceImplTest {
 
     @Test
     void loadUserByUsername() {
-        when(userRepository.findByUsername("junjiezh")).thenReturn(Optional.of(new User("junjiezh", "password")));
+        when(userRepository.findByUsername("junjiezh")).thenReturn(Optional.of(User.builder().username("junjiezh").password("password").build()));
         UserDetails userDetails = userDetailServiceImpl.loadUserByUsername("junjiezh");
         assertThat(userDetails).isNotNull();
         assertThat(userDetails.getUsername()).isEqualTo("junjiezh");

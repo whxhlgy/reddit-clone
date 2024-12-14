@@ -61,7 +61,7 @@ public class AuthService {
      */
     public LoginResponse signup(@Valid SignupRequest signupRequest) {
         try {
-            userService.save(new User(signupRequest.getUsername(), signupRequest.getPassword()));
+            userService.save(User.builder().username(signupRequest.getUsername()).password(signupRequest.getPassword()).build());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyExistsException("The username: " + signupRequest.getUsername() + " already exists");
         }

@@ -1,6 +1,6 @@
 import { HEADER_HEIGHT } from "@/lib/consts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Layout from "@/app/layout";
+import Layout, { loader as headerLoader } from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
 import CommunityHome, {
@@ -12,8 +12,8 @@ import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
 import { action as loginAction, default as LoginPage } from "@/app/auth/login";
 import { Toaster } from "@/components/ui/sonner";
 import SideBarLayout, {
-  action as SideBarAction,
-  loader as SideBarLoader,
+  action as sideBarAction,
+  loader as sideBarLoader,
 } from "@/app/sidebar-layout";
 
 const router = createBrowserRouter([
@@ -28,12 +28,13 @@ const router = createBrowserRouter([
   },
   {
     element: <Layout />,
-    path: "/",
+    loader: headerLoader,
     children: [
       {
         element: <SideBarLayout />,
-        loader: SideBarLoader,
-        action: SideBarAction,
+        path: "/",
+        loader: sideBarLoader,
+        action: sideBarAction,
         errorElement: <ErrorPage />,
         children: [
           {
