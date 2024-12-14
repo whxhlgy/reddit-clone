@@ -1,9 +1,6 @@
 import { HEADER_HEIGHT } from "@/lib/consts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Layout, {
-  action as layoutAction,
-  loader as layoutLoader,
-} from "@/app/layout";
+import Layout from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
 import CommunityHome, {
@@ -14,6 +11,10 @@ import ErrorPage from "@/app/error-page";
 import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
 import { action as loginAction, default as LoginPage } from "@/app/auth/login";
 import { Toaster } from "@/components/ui/sonner";
+import SideBarLayout, {
+  action as SideBarAction,
+  loader as SideBarLoader,
+} from "@/app/sidebar-layout";
 
 const router = createBrowserRouter([
   {
@@ -28,28 +29,33 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     path: "/",
-    loader: layoutLoader,
-    action: layoutAction,
-    errorElement: <ErrorPage />,
     children: [
       {
+        element: <SideBarLayout />,
+        loader: SideBarLoader,
+        action: SideBarAction,
         errorElement: <ErrorPage />,
         children: [
           {
-            index: true,
-            path: "home",
-            element: <Home />,
-          },
-          {
-            loader: communityLoader,
-            action: feedAction,
-            path: "r/:communityName",
-            element: <CommunityHome />,
-          },
-          {
-            path: "r/:communityName/submit",
-            element: <Submit />,
-            loader: feedSubmitLoader,
+            errorElement: <ErrorPage />,
+            children: [
+              {
+                index: true,
+                path: "home",
+                element: <Home />,
+              },
+              {
+                loader: communityLoader,
+                action: feedAction,
+                path: "r/:communityName",
+                element: <CommunityHome />,
+              },
+              {
+                path: "r/:communityName/submit",
+                element: <Submit />,
+                loader: feedSubmitLoader,
+              },
+            ],
           },
         ],
       },

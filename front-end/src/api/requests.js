@@ -1,5 +1,3 @@
-import { redirect } from "react-router-dom";
-
 fetch = ((originFetch) => {
   return async (...args) => {
     const url = args[0];
