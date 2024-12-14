@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class RefreshTokenResponse {
-    @JsonProperty("access_token")
-    String accessToken;
+    String message = "Refresh token successfully";
 }

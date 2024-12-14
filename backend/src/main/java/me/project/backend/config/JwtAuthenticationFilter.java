@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -34,22 +36,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.debug("Authoring request. Request Authorization header: {}", request.getHeader("Authorization"));
-
-        final String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response); // do nothing
-            return;
+        log.debug("Authoring request");
+        String accessToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("access_token")) {
+                    accessToken = cookie.getValue();
+                }
+            }
         }
-        final String jwtToken = authHeader.substring(7);
 
-        if (!jwtService.validateToken(jwtToken)) {
-            throw new BadJwtTokenException(jwtToken);
+        // if the accessToken not valid, try to refresh it with refreshToken
+        if (accessToken == null || !jwtService.validateToken(accessToken)) {
+            log.debug("Invalid token");
+            // throw new BadJwtTokenException(accessToken);
+            doFilter(request, response, filterChain);
+            return;
         }
 
         try {
-            String username = jwtService.extractUsername(jwtToken);
+            String username = jwtService.extractUsername(accessToken);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             // this is a token with isAuthenticated()==true
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

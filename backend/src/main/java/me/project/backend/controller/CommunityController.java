@@ -1,5 +1,6 @@
 package me.project.backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Community;
 import me.project.backend.service.CommunityService;
@@ -18,8 +19,7 @@ public class CommunityController {
     }
 
     @GetMapping
-    public List<Community> findAll() {
-        log.info("find all communities");
+    public List<Community> findAll(HttpServletRequest request) {
         return communityService.findAll();
     }
 
