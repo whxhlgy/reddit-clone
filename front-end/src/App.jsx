@@ -1,6 +1,6 @@
 import { HEADER_HEIGHT } from "@/lib/consts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Layout, { loader as headerLoader } from "@/app/layout";
+import Layout from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
 import CommunityHome, {
@@ -15,6 +15,7 @@ import SideBarLayout, {
   action as sideBarAction,
   loader as sideBarLoader,
 } from "@/app/sidebar-layout";
+import { loader as headerLoader } from "@/components/app-header";
 
 const router = createBrowserRouter([
   {

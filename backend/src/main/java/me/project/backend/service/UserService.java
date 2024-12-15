@@ -7,6 +7,7 @@ import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.payload.UserDTO;
 import me.project.backend.payload.mapper.UserMapper;
 import me.project.backend.repository.UserRepository;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,10 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    private UserDTO anonymousUser() {
+        return new UserDTO("Anonymous");
+    }
+
     public UserDTO findByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
         return UserMapper.map(user);
@@ -39,6 +44,9 @@ public class UserService {
         log.debug("Getting the user info of the current user");
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            return anonymousUser();
+        }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String username = userDetails.getUsername();
         return findByUsername(username);

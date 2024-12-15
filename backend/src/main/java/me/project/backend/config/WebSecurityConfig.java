@@ -49,6 +49,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/users/whoami").permitAll()
                                 .requestMatchers("/filterChain").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()

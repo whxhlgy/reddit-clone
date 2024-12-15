@@ -10,6 +10,7 @@ import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.payload.response.LoginResponse;
 import me.project.backend.payload.request.LoginRequest;
 import me.project.backend.payload.request.SignupRequest;
+import me.project.backend.payload.response.SignOutResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -82,5 +85,14 @@ public class AuthService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl(username, null), null, List.of());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtService.generateJwtToken(authentication);
+    }
+
+    /**
+     * return two expired jwt token
+     */
+    public SignOutResponse signOut() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl("anonymous", null), null, List.of());
+        String jwtToken = jwtService.generateJwtToken(authentication, Date.from(Instant.now()));
+        return new SignOutResponse(jwtToken, jwtToken, "Sign out");
     }
 }

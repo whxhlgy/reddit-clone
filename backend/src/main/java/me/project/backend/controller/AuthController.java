@@ -9,6 +9,7 @@ import me.project.backend.payload.response.LoginResponse;
 import me.project.backend.payload.request.LoginRequest;
 import me.project.backend.payload.request.SignupRequest;
 import me.project.backend.payload.response.RefreshTokenResponse;
+import me.project.backend.payload.response.SignOutResponse;
 import me.project.backend.service.AuthService;
 import me.project.backend.util.Cookies;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,6 +75,13 @@ public class AuthController {
         LoginResponse signup = authService.signup(signupRequest);
         addTokenInCookie(response, signup.getAccessToken(), signup.getRefreshToken());
         return signup;
+    }
+
+    @PostMapping("/signout")
+    public SignOutResponse signOut(HttpServletResponse response) {
+        SignOutResponse signOutResponse = authService.signOut();
+        addTokenInCookie(response, signOutResponse.accessToken(), signOutResponse.refreshToken());
+        return signOutResponse;
     }
 
     @PostMapping("/refresh")
