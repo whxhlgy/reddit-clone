@@ -3,6 +3,7 @@ package me.project.backend.service;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Post;
+import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.repository.PostRepository;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,6 +32,12 @@ public class PostService {
     public PostDTO save(Post post) {
         log.info("save post: {}", post);
         Post save = postRepository.save(post);
+        return mapper.map(post, PostDTO.class);
+    }
+
+    public PostDTO findById(long postId) {
+        log.info("find post by id: {}", postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         return mapper.map(post, PostDTO.class);
     }
 }

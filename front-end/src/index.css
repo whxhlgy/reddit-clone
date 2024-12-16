@@ -11,7 +11,11 @@
 /*}*/
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Reddit Sans", Inter, system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
   line-height: 1.5;
   font-weight: 400;
   --header-height: 64px;
@@ -70,7 +74,7 @@ button {
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
-    --primary: 47.9 95.8% 53.1%;
+    --primary: 204 13.5% 92.7%;
     --primary-foreground: 26 83.3% 14.1%;
     --secondary: 60 4.8% 95.9%;
     --secondary-foreground: 24 9.8% 10%;

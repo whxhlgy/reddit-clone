@@ -1,6 +1,6 @@
 import { HEADER_HEIGHT } from "@/lib/consts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Layout from "@/app/layout";
+import Layout, { loader as headerLoader } from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
 import CommunityHome, {
@@ -15,8 +15,11 @@ import SideBarLayout, {
   action as sideBarAction,
   loader as sideBarLoader,
 } from "@/app/sidebar-layout";
-import { loader as headerLoader } from "@/components/app-header";
 import CommLayout from "@/app/comm-layout";
+import CommentsIndex, {
+  action as commentAction,
+  loader as commentLoader,
+} from "@/app/comment";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +70,9 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "comments/:postId",
-                    // element:
+                    element: <CommentsIndex />,
+                    loader: commentLoader,
+                    action: commentAction,
                   },
                 ],
               },

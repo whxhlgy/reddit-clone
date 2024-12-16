@@ -21,6 +21,11 @@ public class PostController {
         return postService.findAll();
     }
 
+    @GetMapping("/{postId}")
+    public PostDTO findById(@PathVariable Long postId) {
+        return postService.findById(postId);
+    }
+
     @PostMapping
     public PostDTO save(@RequestBody Post post) {
         return postService.save(post);

@@ -46,10 +46,8 @@ public class BackendApplication implements CommandLineRunner {
         post2.setUsername("anonymous");
         post2.setLikesCount(100L);
 
-        post2.addComment(new Comment());
+        post2.addComment(new Comment("anonymous", "I agree with you"));
         postService.save(post2);
-
-
 
         // create a user for test
         User user = new User();

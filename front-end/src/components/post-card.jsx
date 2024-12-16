@@ -1,20 +1,21 @@
+import LikeButton from "@/components/like-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { getInitials } from "@/lib/utils";
-import classNames from "classnames";
-import { ArrowBigDown, ArrowBigUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
-export const PostCardWrapper = ({ children }) => {
+export const PostCardWrapper = ({ children, postId }) => {
   return (
     <div className="border-t-[1px] last:border-b-[1px] py-1">
-      <div className="hover:bg-accent1 rounded-[--radius]">{children}</div>
+      <div className="hover:bg-accent1 rounded-[--radius]">
+        <Link to={`comments/${postId}`}>{children}</Link>
+      </div>
     </div>
   );
 };
 
 const PostCard = ({ post }) => {
   return (
-    <PostCardWrapper>
+    <PostCardWrapper postId={post.id}>
       <div className="rounded-xl flex flex-col">
         {/* Header */}
         <div className="flex flex-row items-center gap-2">
@@ -32,46 +33,7 @@ const PostCard = ({ post }) => {
 
         {/* Footer */}
         <div className="flex justify-start">
-          <div
-            className={classNames(
-              "rounded-[--radius] flex items-center space-x-1",
-              {
-                "bg-[#FF4500] text-white": post.reaction === "like",
-                "bg-[#1E90FF] text-white": post.reaction === "dislike",
-                "bg-accent ": post.reaction === null,
-              },
-            )}
-          >
-            <Button
-              variant={classNames({
-                ghost_red: post.reaction === "like",
-                ghost_blue: post.reaction === "dislike",
-                ghost_deeper: post.reaction == null,
-              })}
-              size="icon"
-            >
-              <ArrowBigUp
-                className={classNames({
-                  "fill-white": post.reaction === "like",
-                })}
-              />
-            </Button>
-            <span className="text-xs">{post.likesCount}</span>
-            <Button
-              variant={classNames({
-                ghost_red: post.reaction === "like",
-                ghost_blue: post.reaction === "dislike",
-                ghost_deeper: post.reaction == null,
-              })}
-              size="icon"
-            >
-              <ArrowBigDown
-                className={classNames({
-                  "fill-white": post.reaction === "dislike",
-                })}
-              />
-            </Button>
-          </div>
+          <LikeButton post={post} />
         </div>
       </div>
     </PostCardWrapper>
