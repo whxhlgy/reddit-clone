@@ -1,5 +1,6 @@
-package me.project.backend.exception;
+package me.project.backend.exception.notFound;
 
+import me.project.backend.exception.ServiceException;
 import org.springframework.http.HttpStatus;
 
 public class UserNotFoundException extends ServiceException {
