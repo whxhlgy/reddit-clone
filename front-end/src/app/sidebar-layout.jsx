@@ -32,10 +32,7 @@ export default function SideBarLayout() {
       <AppSidebar communities={communities} />
       <main className="bg-feed-background relative w-full z-0 top-[--header-height] scroll-mt-[--header-height] px-4 py-2 flex justify-center items-start">
         <div className="max-w-screen-xl flex-grow flex justify-center items-start">
-          <div className="w-2/3">
-            <Outlet />
-          </div>
-          <div className="w-1/3 bg-blue-50">SIDEBAR</div>
+          <Outlet />
         </div>
       </main>
     </>

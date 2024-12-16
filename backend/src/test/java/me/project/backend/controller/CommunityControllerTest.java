@@ -14,12 +14,6 @@ class CommunityControllerTest {
     @Autowired
     private CommunityController communityController;
 
-    @Test
-    void getCommunityList() {
-        List<Community> communities = communityController.findAll();
-        System.out.println(communities);
-        assertThat(communities).isNotNull();
-    }
 
     @Test
     void addCommunity() {

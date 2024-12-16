@@ -1,4 +1,4 @@
-package me.project.backend.payload;
+package me.project.backend.payload.dto;
 
 import lombok.Builder;
 

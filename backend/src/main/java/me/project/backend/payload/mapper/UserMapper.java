@@ -1,7 +1,7 @@
 package me.project.backend.payload.mapper;
 
 import me.project.backend.domain.User;
-import me.project.backend.payload.UserDTO;
+import me.project.backend.payload.dto.UserDTO;
 
 public class UserMapper {
     static public UserDTO map(User user) {

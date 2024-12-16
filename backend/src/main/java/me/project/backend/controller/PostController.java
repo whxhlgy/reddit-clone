@@ -1,6 +1,7 @@
 package me.project.backend.controller;
 
 import me.project.backend.domain.Post;
+import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.service.PostService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,12 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> findAll() {
+    public List<PostDTO> findAll() {
         return postService.findAll();
     }
 
     @PostMapping
-    public Post save(@RequestBody Post post) {
+    public PostDTO save(@RequestBody Post post) {
         return postService.save(post);
     }
 }

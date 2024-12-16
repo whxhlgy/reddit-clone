@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.User;
 import me.project.backend.exception.UserNotFoundException;
 import me.project.backend.payload.UserDetailsImpl;
-import me.project.backend.payload.UserDTO;
+import me.project.backend.payload.dto.UserDTO;
 import me.project.backend.payload.mapper.UserMapper;
 import me.project.backend.repository.UserRepository;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

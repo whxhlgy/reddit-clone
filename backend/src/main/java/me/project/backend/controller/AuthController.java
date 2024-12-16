@@ -54,7 +54,7 @@ public class AuthController {
             refreshTokenCookie.setHttpOnly(true);
             refreshTokenCookie.setMaxAge(jwtRefreshExpirationSc);
             refreshTokenCookie.setSecure(false);
-            refreshTokenCookie.setPath("/auth/refresh");
+            refreshTokenCookie.setPath("/api/auth/refresh");
             refreshTokenCookie.setAttribute("SameSite", "Strict");
             response.addCookie(refreshTokenCookie);
         }

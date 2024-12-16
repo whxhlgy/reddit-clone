@@ -20,8 +20,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
 
-    private String jwtSecret = "86c2b0a44ec2116a0e822584c7bad3e1357b6417bb81c7957c8e9301b580049c";
-    private int jwtExpirationMs = 3600000;
     private JwtService jwtService;
     UserDetails userDetails = User.builder()
             .username("testUser")
@@ -30,7 +28,10 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService(jwtSecret, jwtExpirationMs);
+        String jwtSecret = "86c2b0a44ec2116a0e822584c7bad3e1357b6417bb81c7957c8e9301b580049c";
+        int jwtExpirationMs = 3600000;
+        int jwtRefreshTokenMs = 604800000;
+        jwtService = new JwtService(jwtSecret, jwtExpirationMs, jwtRefreshTokenMs);
     }
 
     @Mock

@@ -1,5 +1,6 @@
 package me.project.backend;
 
+import me.project.backend.domain.Comment;
 import me.project.backend.domain.Community;
 import me.project.backend.domain.Post;
 import me.project.backend.domain.User;
@@ -37,12 +38,18 @@ public class BackendApplication implements CommandLineRunner {
         post.setUsername("anonymous");
         post.setLikesCount(100L);
         postService.save(post);
+
+
         Post post2 = new Post();
         post2.setContent("test2");
         post2.setTitle("test title2");
         post2.setUsername("anonymous");
         post2.setLikesCount(100L);
+
+        post2.addComment(new Comment());
         postService.save(post2);
+
+
 
         // create a user for test
         User user = new User();

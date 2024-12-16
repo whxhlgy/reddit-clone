@@ -1,6 +1,6 @@
 package me.project.backend.controller;
 
-import me.project.backend.payload.UserDTO;
+import me.project.backend.payload.dto.UserDTO;
 import me.project.backend.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

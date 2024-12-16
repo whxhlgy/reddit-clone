@@ -16,6 +16,7 @@ import SideBarLayout, {
   loader as sideBarLoader,
 } from "@/app/sidebar-layout";
 import { loader as headerLoader } from "@/components/app-header";
+import CommLayout from "@/app/comm-layout";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +37,7 @@ const router = createBrowserRouter([
         path: "/",
         loader: sideBarLoader,
         action: sideBarAction,
-        errorElement: <ErrorPage />,
+        // errorElement: <ErrorPage />,
         children: [
           {
             errorElement: <ErrorPage />,
@@ -46,16 +47,29 @@ const router = createBrowserRouter([
                 path: "home",
                 element: <Home />,
               },
+              // This is for community info
               {
-                loader: communityLoader,
-                action: feedAction,
                 path: "r/:communityName",
-                element: <CommunityHome />,
-              },
-              {
-                path: "r/:communityName/submit",
-                element: <Submit />,
-                loader: feedSubmitLoader,
+                element: <CommLayout />,
+                children: [
+                  // This is for community feed
+                  {
+                    loader: communityLoader,
+                    action: feedAction,
+                    // path: "home",
+                    index: true,
+                    element: <CommunityHome />,
+                  },
+                  {
+                    path: "submit",
+                    element: <Submit />,
+                    loader: feedSubmitLoader,
+                  },
+                  {
+                    path: "comments/:postId",
+                    // element:
+                  },
+                ],
               },
             ],
           },
