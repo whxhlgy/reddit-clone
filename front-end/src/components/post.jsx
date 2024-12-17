@@ -2,13 +2,17 @@ import LikeButton from "@/components/like-button";
 import { AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 
 const Post = ({ post }) => {
+  const { communityName } = useParams();
   return (
     <div className="flex flex-col items-start gap-2">
       <div className="flex flex-row justify-start gap-2">
-        <Button size="icon">
-          <ArrowLeft />
+        <Button size="icon" asChild>
+          <Link to={`/r/${communityName}/`}>
+            <ArrowLeft />
+          </Link>
         </Button>
         <Avatar>
           <AvatarFallback>CN</AvatarFallback>
