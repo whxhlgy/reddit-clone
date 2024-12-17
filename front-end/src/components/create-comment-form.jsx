@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { UserContext } from "@/lib/context";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +39,7 @@ const CommentForm = () => {
       method: "post",
       encType: "application/json",
     });
+    form.setValue("content", "");
   }
 
   return (
@@ -46,6 +53,7 @@ const CommentForm = () => {
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
