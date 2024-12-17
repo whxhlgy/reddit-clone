@@ -20,7 +20,7 @@ const LikeButton = ({ post, className }) => {
         variant={classNames({
           ghost_red: reaction === "like",
           ghost_blue: reaction === "dislike",
-          ghost_deeper: reaction == null,
+          ghost: reaction == null,
         })}
         size="icon"
       >
@@ -35,7 +35,7 @@ const LikeButton = ({ post, className }) => {
         variant={classNames({
           ghost_red: reaction === "like",
           ghost_blue: reaction === "dislike",
-          ghost_deeper: reaction == null,
+          ghost: reaction == null,
         })}
         size="icon"
       >

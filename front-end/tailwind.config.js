@@ -10,6 +10,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        buttonGray: {
+          lg: "hsl(var(--gray-lg))",
+          xl: "hsl(var(--gray-xl))",
+        },
         background: "hsl(var(--background))",
         feed: {
           background: "rgb(249, 250, 251)",
