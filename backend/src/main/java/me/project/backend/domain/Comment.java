@@ -1,8 +1,11 @@
 package me.project.backend.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -18,7 +21,7 @@ public class Comment {
 
     private String content;
 
-    private Long parentCommentId;
+    private Long parentId;
 
     public Comment(String username, String content) {
         this.username = username;
