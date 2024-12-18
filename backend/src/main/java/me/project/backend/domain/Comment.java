@@ -22,9 +22,4 @@ public class Comment {
     private String content;
 
     private Long parentId;
-
-    public Comment(String username, String content) {
-        this.username = username;
-        this.content = content;
-    }
 }

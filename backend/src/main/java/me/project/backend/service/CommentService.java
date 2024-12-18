@@ -7,7 +7,6 @@ import me.project.backend.domain.Post;
 import me.project.backend.exception.notFound.CommentNotFoundException;
 import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.payload.dto.CommentDTO;
-import me.project.backend.payload.dto.CommentTreeDTO;
 import me.project.backend.repository.CommentClosureRepository;
 import me.project.backend.repository.CommentRepository;
 import me.project.backend.repository.PostRepository;
@@ -35,10 +34,17 @@ public class CommentService {
         this.closureRepository = commentClosureRepository;
     }
 
-    public List<CommentDTO> findAllByPostId(int postId) {
-        Post post = postRepository.findPostWithCommentsById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-        List<Comment> comments = post.getComments();
-        return modelMapper.map(comments, new TypeToken<List<CommentDTO>>() {}.getType());
+    public List<CommentDTO> findAllByPostId(long postId) {
+        List<Comment> comments = commentRepository.findCommentsByPostId(postId);
+        List<CommentDTO> commentDTOs = new ArrayList<>();
+        for (Comment comment : comments) {
+            if (Objects.equals(comment.getParentId(), null)) {
+                CommentDTO commentDTO = modelMapper.map(comment, CommentDTO.class);
+                buildTree(commentDTO, comments);
+                commentDTOs.add(commentDTO);
+            }
+        }
+        return commentDTOs;
     }
 
     @Transactional
@@ -68,40 +74,21 @@ public class CommentService {
         }
     }
 
-    public CommentTreeDTO findAllByAncestor(long ancestorId) {
+    public CommentDTO findAllByAncestorId(long ancestorId) {
         Comment ancestor = commentRepository.findById(ancestorId).orElseThrow(() -> new CommentNotFoundException(ancestorId));
-        List<CommentClosure> ancestorClosures = closureRepository.findALlByAncestor(ancestor);
-
-        ArrayList<Comment> descendants = new ArrayList<>();
-        for (CommentClosure ancestorClosure : ancestorClosures) {
-            descendants.add(ancestorClosure.getDescendant());
-        }
-
-        CommentTreeDTO tree = new CommentTreeDTO();
-        for (Comment comment : descendants) {
-            if (Objects.equals(comment.getId(), ancestorId)) {
-                tree.setId(comment.getId());
-                tree.setContent(comment.getContent());
-                tree.setChildren(new ArrayList<>());
-                break;
-            }
-        }
-        assert tree.getId() != null;
-        return buildTree(tree, descendants, ancestorId);
+        List<Comment> descendants = commentRepository.findCommentByAncestorId(ancestorId);
+        CommentDTO tree = modelMapper.map(ancestor, CommentDTO.class);
+        buildTree(tree, descendants);
+        return tree;
     }
 
-    private CommentTreeDTO buildTree(CommentTreeDTO tree, List<Comment> descendants, Long parentId) {
+    private void buildTree(CommentDTO ancestor, List<Comment> descendants) {
         for (Comment comment : descendants) {
-            if (Objects.equals(comment.getParentId(), parentId)) {
-                CommentTreeDTO subtree = new CommentTreeDTO();
-                subtree.setChildren(new ArrayList<>());
-                subtree.setId(comment.getId());
-                subtree.setContent(comment.getContent());
-                buildTree(subtree, descendants, comment.getId());
-                tree.getChildren().add(subtree);
+            if (Objects.equals(comment.getParentId(), ancestor.getId())) {
+                CommentDTO child = modelMapper.map(comment, CommentDTO.class);
+                buildTree(child, descendants);
+                ancestor.getChildren().add(child);
             }
         }
-
-        return tree;
     }
 }

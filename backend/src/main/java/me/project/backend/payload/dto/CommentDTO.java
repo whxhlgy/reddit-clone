@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.project.backend.domain.Post;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class CommentDTO {
@@ -15,6 +18,8 @@ public class CommentDTO {
 
     @NotBlank
     private String username;
+
+    private List<CommentDTO> children = new ArrayList<>();
 
     public CommentDTO(String content, String username) {
         this.content = content;

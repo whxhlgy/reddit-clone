@@ -1,36 +1,42 @@
 package me.project.backend.repository;
 
 import me.project.backend.domain.Comment;
+import me.project.backend.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
+    List<Comment> findByPostAndParentId(Post post, Long parentId);
 
-    /**
-     * @param commentId
-     * @param generationNumber the depth of comment tree, the depth of root is 0
-     * @return
-     */
+
     @Query(
-            nativeQuery = true,
-            value = """
-WITH RECURSIVE generation AS
-(
-SELECT comment.*, 0 AS generation_number
-FROM comment
-WHERE comment.id = ?1
-UNION ALL
-SELECT c.*, p.generation_number + 1 AS generation_number
-FROM comment as c
-INNER JOIN generation as p
-ON p.id = c.parent_comment_id AND p.generation_number < ?2
-)
-SELECT c.id, c.parent_comment_id, c.post_id, c.content, c.username
-FROM generation AS c
+            """
+SELECT c
+FROM Comment c
+JOIN CommentClosure cc
+ON cc.ancestor.id = :ancestor_id
+WHERE c.id = cc.descendant.id
 """
     )
-    List<Comment> findDescendant(long commentId, int generationNumber);
+    List<Comment> findCommentByAncestorId(@Param("ancestor_id") Long id);
+
+    @Query(
+            """
+SELECT c
+FROM Comment c
+LEFT JOIN CommentClosure cc
+ON cc.ancestor IN (
+    SELECT p
+    FROM Comment p
+    WHERE p.post.id = :post_id
+    AND p.parentId IS NULL
+)
+WHERE c.id = cc.descendant.id
+"""
+    )
+    List<Comment> findCommentsByPostId(@Param("post_id") Long id);
 }

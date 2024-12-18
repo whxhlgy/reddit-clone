@@ -10,5 +10,5 @@ public interface CommentClosureRepository extends JpaRepository<CommentClosure, 
 
     List<CommentClosure> findAllByDescendant(Comment descendant);
 
-    List<CommentClosure> findALlByAncestor(Comment ancestor);
+    List<CommentClosure> findALlByAncestorAndDistanceGreaterThan(Comment ancestor, Integer distanceIsGreaterThan);
 }

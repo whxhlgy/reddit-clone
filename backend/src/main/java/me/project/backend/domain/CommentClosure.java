@@ -13,11 +13,9 @@ public class CommentClosure {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ancestor_id")
     private Comment ancestor;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "descendant_id")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Comment descendant;
 
     private Integer distance;

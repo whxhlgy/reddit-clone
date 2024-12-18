@@ -2,7 +2,6 @@ package me.project.backend.controller;
 
 import jakarta.validation.Valid;
 import me.project.backend.payload.dto.CommentDTO;
-import me.project.backend.payload.dto.CommentTreeDTO;
 import me.project.backend.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,7 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}")
-    public List<CommentDTO> findCommentsByPostId(@PathVariable int postId) {
+    public List<CommentDTO> findCommentsByPostId(@PathVariable long postId) {
         return commentService.findAllByPostId(postId);
     }
 
@@ -30,7 +29,7 @@ public class CommentController {
     }
 
     @GetMapping("/comment/{commentId}")
-    public CommentTreeDTO findAllDescendantsByCommentId(@PathVariable int commentId) {
-        return commentService.findAllByAncestor(commentId);
+    public CommentDTO findAllDescendantsByCommentId(@PathVariable int commentId) {
+        return commentService.findAllByAncestorId(commentId);
     }
 }
