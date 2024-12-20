@@ -24,7 +24,17 @@ const Comment = ({ comment }) => {
 
       <div className={`relative grid ml-2 grid-cols-[24px_1fr]`}>
         {/* main thread */}
-        <div className="absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px]" />
+        <div
+          className={classNames(
+            "absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px] cursor-pointer z-10",
+            {
+              "bg-threadDark": over === true,
+            },
+          )}
+          onClick={() => setExpand(!expand)}
+          onMouseEnter={() => setOver(true)}
+          onMouseOut={() => setOver(false)}
+        />
 
         {/* content */}
         <div className="contents">
@@ -33,7 +43,11 @@ const Comment = ({ comment }) => {
         </div>
 
         {/* children */}
-        <div className="contents">
+        <div
+          className={classNames("contents", {
+            hidden: expand === false,
+          })}
+        >
           {comment.children && comment.children.length > 0 && (
             <>
               {comment.children.map((child, index) => (
@@ -43,10 +57,19 @@ const Comment = ({ comment }) => {
                       {/* branch line */}
                       <div
                         className={classNames("relative flex justify-end", {
-                          "bg-feed-background": index == children.length - 1,
+                          "bg-feed-background z-20":
+                            index == children.length - 1,
                         })}
                       >
-                        <div className="absolute w-3 h-3 border-solid border-l-[1px] border-b-[1px] border-b-thread-normal border-l-thread-normal rounded-bl-sm" />
+                        <div
+                          className={classNames(
+                            "absolute w-3 h-3 border-solid border-l-[1px] border-b-[1px] border-b-thread-normal border-l-thread-normal rounded-bl-sm",
+                            {
+                              "border-l-thread-dark border-b-thread-dark":
+                                over === true,
+                            },
+                          )}
+                        />
                       </div>
                       {/* child */}
                       <Comment key={child.id} comment={child} />
