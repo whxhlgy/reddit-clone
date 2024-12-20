@@ -10,6 +10,7 @@ const Comment = ({ comment }) => {
     console.log(`expand: ${expand}`);
     setExpand(!expand);
   };
+  const children = comment.children;
 
   return (
     <div>
@@ -22,52 +23,40 @@ const Comment = ({ comment }) => {
       </div>
 
       <div className={`relative grid ml-2 grid-cols-[24px_1fr]`}>
-        {/* thread line */}
-        <ThreadLine
-          className="row-start-1"
-          over={over}
-          setOver={setOver}
-          onClick={onExpand}
-        />
+        {/* main thread */}
+        <div className="absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px]" />
 
         {/* content */}
-        <div className="max-h-10 col-start-auto row-start-1 row-end-1">
+        <div className="contents">
+          <div />
           <p>{comment.content}</p>
         </div>
 
         {/* children */}
-        <>
+        <div className="contents">
           {comment.children && comment.children.length > 0 && (
             <>
               {comment.children.map((child, index) => (
-                <>
-                  {index !== comment.children.length - 1 && (
-                    <ThreadLine
-                      className={classNames("col-start-1", {
-                        hidden: expand === false,
-                      })}
-                      over={over}
-                      setOver={setOver}
-                      onClick={onExpand}
-                    />
-                  )}
-                  <div
-                    className={classNames("col-start-2", {
-                      hidden: expand === false,
-                    })}
-                  >
-                    <ThreadPointer
-                      over={over}
-                      setOver={setOver}
-                      onClick={onExpand}
-                    />
-                    <Comment key={child.id} comment={child} />
-                  </div>
-                </>
+                <div className="contents" key={child.id}>
+                  {
+                    <>
+                      {/* branch line */}
+                      <div
+                        className={classNames("relative flex justify-end", {
+                          "bg-feed-background": index == children.length - 1,
+                        })}
+                      >
+                        <div className="absolute w-3 h-3 border-solid border-l-[1px] border-b-[1px] border-b-thread-normal border-l-thread-normal rounded-bl-sm" />
+                      </div>
+                      {/* child */}
+                      <Comment key={child.id} comment={child} />
+                    </>
+                  }
+                </div>
               ))}
             </>
           )}
-        </>
+        </div>
       </div>
     </div>
   );
