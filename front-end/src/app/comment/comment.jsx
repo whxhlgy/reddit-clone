@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import classNames from "classnames";
+import { CircleMinus, CirclePlus } from "lucide-react";
 import { useState } from "react";
 
 const Comment = ({ comment }) => {
@@ -26,20 +27,36 @@ const Comment = ({ comment }) => {
         {/* main thread */}
         <div
           className={classNames(
-            "absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px] cursor-pointer z-10",
+            "absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px]",
             {
               "bg-threadDark": over === true,
             },
           )}
+        ></div>
+        {/* clickable main thread */}
+        <div
+          className={classNames(
+            "absolute top-0 left-0 w-6 h-full cursor-pointer z-10",
+          )}
           onClick={() => setExpand(!expand)}
           onMouseEnter={() => setOver(true)}
           onMouseOut={() => setOver(false)}
-        />
+        ></div>
 
         {/* content */}
         <div className="contents">
           <div />
           <p>{comment.content}</p>
+        </div>
+
+        {/* action row */}
+        <div className={"contents"}>
+          {expand ? (
+            <CircleMinus size="16px" className="ml-1 z-0 bg-feed-background" />
+          ) : (
+            <CirclePlus size="16px" className="ml-1 z-0 bg-feed-background" />
+          )}
+          <div></div>
         </div>
 
         {/* children */}
