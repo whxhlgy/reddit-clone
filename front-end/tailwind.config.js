@@ -4,12 +4,20 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        thread: "linear-gradient(#E4E4E4, #E4E4E4)",
+        threadDark: "linear-gradient(#434343, #434343)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        thread: {
+          normal: "#E4E4E4",
+          dark: "#434343",
+        },
         buttonGray: {
           lg: "hsl(var(--gray-lg))",
           xl: "hsl(var(--gray-xl))",

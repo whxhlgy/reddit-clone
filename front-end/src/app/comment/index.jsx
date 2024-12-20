@@ -1,10 +1,10 @@
 import { useLoaderData } from "react-router-dom";
 import Post from "@/components/post";
-import Comment from "@/app/comment/comment";
 import { Separator } from "@/components/ui/separator";
 import CommentForm from "@/components/create-comment-form";
 import { createComment, findAllByPostId } from "@/api/comment";
 import { getPostById } from "@/api/post";
+import Comments from "@/app/comment/comments";
 
 export async function loader({ params }) {
   const postId = params.postId;
@@ -32,9 +32,7 @@ const CommentsIndex = () => {
       <Separator />
 
       {/* comments */}
-      {comments.map((comment) => (
-        <Comment comment={comment} key={comment.id} />
-      ))}
+      <Comments comments={comments} />
     </div>
   );
 };
