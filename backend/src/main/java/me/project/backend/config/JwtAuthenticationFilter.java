@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.exception.auth.BadJwtTokenException;
+import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.service.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,12 +26,9 @@ import java.util.List;
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final UserDetailsService userDetailsService;
-
     private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(UserDetailsService userDetailsService, JwtService jwtService) {
-        this.userDetailsService = userDetailsService;
+    public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -47,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // if the accessToken not valid, try to refresh it with refreshToken
+        // check validity of token
         if (accessToken == null || !jwtService.validateToken(accessToken)) {
             log.debug("Invalid token");
             // throw new BadJwtTokenException(accessToken);
@@ -57,12 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String username = jwtService.extractUsername(accessToken);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             // this is a token with isAuthenticated()==true
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl(username, null), null, List.of());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("Authoring completed");
             filterChain.doFilter(request, response);
         } catch (Exception e) {
