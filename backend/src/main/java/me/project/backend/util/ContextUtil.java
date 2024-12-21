@@ -17,7 +17,7 @@ public class ContextUtil {
             log.error("Cannot get username: {}", e.getMessage());
             return Optional.empty();
         }
-        log.debug("principal: {}", principal);
+        log.debug("get username: {}", principal.getUsername());
         return Optional.of(principal.getUsername());
     }
 }
