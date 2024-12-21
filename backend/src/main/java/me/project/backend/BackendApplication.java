@@ -11,9 +11,11 @@ import me.project.backend.service.CommentService;
 import me.project.backend.service.CommunityService;
 import me.project.backend.service.PostService;
 import me.project.backend.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 @SpringBootApplication
 public class BackendApplication implements CommandLineRunner {

@@ -1,0 +1,33 @@
+services:
+  reddit-backend:
+    image: backend:0.0.1-SNAPSHOT
+    networks:
+      - reddit-net
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+  mysql:
+    image: "mysql:9"
+    networks:
+      - reddit-net
+    environment:
+      MYSQL_DATABASE: reddit
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+  redis:
+    image: "redis:8.0-M02-alpine3.20"
+    networks:
+      - reddit-net
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis
+      - redis-data:/data
+
+
+networks:
+  reddit-net:
+
+volumes:
+  mysql-data:
+  redis-data:

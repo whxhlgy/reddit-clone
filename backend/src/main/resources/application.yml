@@ -4,9 +4,9 @@ spring:
   application:
     name: reddit-backend
   datasource:
-    url: 'jdbc:mysql://127.0.0.1:3306/reddit'
+    url: 'jdbc:mysql://mysql/reddit'
     username: 'root'
-    password: ''
+    password: 'root'
   jpa:
     open-in-view: false
     hibernate:
@@ -15,6 +15,9 @@ spring:
   sql:
     init:
       mode: always
+  output:
+    ansi:
+      enabled: always
 logging:
   level:
     me.project: DEBUG
