@@ -28,7 +28,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentClosureRepository closureRepository;
     private final ILikeService likeService;
-    private final Integer GENERATION_NUMBER = 3;
 
     public CommentService(ModelMapper modelMapper, PostRepository postRepository, CommentRepository commentRepository, CommentClosureRepository commentClosureRepository, ILikeService likeService) {
         this.modelMapper = modelMapper;
@@ -43,7 +42,7 @@ public class CommentService {
         List<CommentDTO> commentDTOs = new ArrayList<>();
         for (Comment comment : comments) {
             if (Objects.equals(comment.getParentId(), null)) {
-                CommentDTO commentDTO = convertCommentToDTOWithReaction(comment);
+                CommentDTO commentDTO = convertCommentToDTOWithReactionAndLikeCount(comment);
                 buildTree(commentDTO, comments);
                 commentDTOs.add(commentDTO);
             }
@@ -54,7 +53,7 @@ public class CommentService {
     public CommentDTO findAllByAncestorId(long ancestorId) {
         Comment ancestor = commentRepository.findById(ancestorId).orElseThrow(() -> new CommentNotFoundException(ancestorId));
         List<Comment> descendants = commentRepository.findCommentByAncestorId(ancestorId);
-        CommentDTO tree = convertCommentToDTOWithReaction(ancestor);
+        CommentDTO tree = convertCommentToDTOWithReactionAndLikeCount(ancestor);
         buildTree(tree, descendants);
         return tree;
     }
@@ -62,7 +61,7 @@ public class CommentService {
     private void buildTree(CommentDTO ancestor, List<Comment> descendants) {
         for (Comment comment : descendants) {
             if (Objects.equals(comment.getParentId(), ancestor.getId())) {
-                CommentDTO child = convertCommentToDTOWithReaction(comment);
+                CommentDTO child = convertCommentToDTOWithReactionAndLikeCount(comment);
                 buildTree(child, descendants);
                 ancestor.getChildren().add(child);
             }
@@ -97,9 +96,10 @@ public class CommentService {
         }
     }
 
-    private CommentDTO convertCommentToDTOWithReaction(Comment comment) {
+    private CommentDTO convertCommentToDTOWithReactionAndLikeCount(Comment comment) {
         CommentDTO dto = modelMapper.map(comment, CommentDTO.class);
         dto.setReaction(likeService.getUserReactionByCommentId(comment.getId()));
+        dto.setLikeCount(likeService.countLikeByCommentId(comment.getId()));
         return dto;
     }
 

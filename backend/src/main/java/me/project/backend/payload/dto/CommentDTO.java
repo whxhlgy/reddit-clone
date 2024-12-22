@@ -28,6 +28,8 @@ public class CommentDTO {
 
     private int reaction;
 
+    private int likeCount;
+
     public CommentDTO(String content, String username) {
         this.content = content;
         this.username = username;

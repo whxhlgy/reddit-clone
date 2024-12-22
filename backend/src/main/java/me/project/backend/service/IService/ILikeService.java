@@ -8,4 +8,5 @@ public interface ILikeService {
 
    LikeDTO likeCommentByCommentId(long commentId, int reaction);
 
+   int countLikeByCommentId(long commentId);
 }

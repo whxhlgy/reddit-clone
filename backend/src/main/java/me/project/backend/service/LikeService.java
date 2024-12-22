@@ -61,7 +61,6 @@ public class LikeService implements ILikeService {
 
         // update or insert the like reaction
         Optional<CommentLike> likeCommentOptional = commentLikeRepository.findCommentLikeByUsernameAndComment(username.get(), comment);
-        CommentLike commentLike1 = new CommentLike();
         if (likeCommentOptional.isEmpty()) {
             log.debug("Cannot find like record, insert one");
             CommentLike save = commentLikeRepository.save(CommentLike.builder()
@@ -77,5 +76,10 @@ public class LikeService implements ILikeService {
             CommentLike save = commentLikeRepository.save(commentLike);
             return modelMapper.map(save, LikeDTO.class);
         }
+    }
+
+    public int countLikeByCommentId(long commentId) {
+        log.debug("countLike commentId:{}", commentId);
+        return commentLikeRepository.sumCommentLikeByCommentId(commentId).orElse(0);
     }
 }
