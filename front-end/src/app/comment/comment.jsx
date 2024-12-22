@@ -51,13 +51,19 @@ const Comment = ({ comment }) => {
         </div>
 
         {/* action row */}
-        <div className={"contents"}>
+        <div className="contents">
           {expand ? (
-            <CircleMinus size="16px" className="ml-1 z-0 bg-feed-background" />
+            <CircleMinus
+              size="16px"
+              className="justify-self-center self-center z-0 bg-feed-background"
+            />
           ) : (
-            <CirclePlus size="16px" className="ml-1 z-0 bg-feed-background" />
+            <CirclePlus
+              size="16px"
+              className="justify-self-center self-center z-0 bg-feed-background"
+            />
           )}
-          <div className="justify-self-start">
+          <div className="justify-self-start items-center">
             <CommentLike comment={comment} />
           </div>
         </div>

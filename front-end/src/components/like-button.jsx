@@ -19,7 +19,7 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
   return (
     <div
       className={classNames(
-        "rounded-[--radius] flex items-center space-x-1",
+        "rounded-[--radius] flex items-center space-x-2",
         {
           "bg-buttonRed-normal text-white": size === "md" && reaction === 1,
           "bg-buttonBlue-normal text-white": size === "md" && reaction === -1,
@@ -45,7 +45,7 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
           })}
         />
       </Button>
-      <span className="text-xs">{likeCount}</span>
+      <span className="text-xs font-semibold">{likeCount}</span>
       <Button
         onClick={reaction === -1 ? noneLike : dislike}
         reaction={reaction}

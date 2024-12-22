@@ -18,5 +18,7 @@ public class PostDTO {
 
     private String content;
 
-    private Long likesCount;
+    private int reaction;
+
+    private int likeCount;
 }

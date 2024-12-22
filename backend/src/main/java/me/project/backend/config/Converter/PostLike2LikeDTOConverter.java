@@ -4,13 +4,13 @@ import me.project.backend.domain.CommentLike;
 import me.project.backend.payload.dto.LikeDTO;
 import org.modelmapper.AbstractConverter;
 
-public class LikeComment2LikeDTOConverter extends AbstractConverter<CommentLike, LikeDTO> {
+public class PostLike2LikeDTOConverter extends AbstractConverter<CommentLike, LikeDTO> {
     @Override
     protected LikeDTO convert(CommentLike source) {
         return LikeDTO.builder()
                 .username(source.getUsername())
                 .reaction(source.getReaction())
-                .type(LikeDTO.Type.COMMENT)
+                .type(LikeDTO.Type.POST)
                 .build();
     }
 }

@@ -2,7 +2,6 @@ package me.project.backend.controller;
 
 import me.project.backend.payload.dto.LikeDTO;
 import me.project.backend.service.IService.ILikeService;
-import me.project.backend.service.LikeService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +16,12 @@ public class LikeController {
 
     @PostMapping("/comment/{id}")
     public LikeDTO likeComment(@PathVariable Long id, @RequestParam Integer reaction) {
-        return likeService.likeCommentByCommentId(id, reaction);
+        return likeService.likeCommentById(id, reaction);
+    }
+
+    @PostMapping("/post/{id}")
+    public LikeDTO likePost(@PathVariable Long id, @RequestParam Integer reaction) {
+        return likeService.likePostById(id, reaction);
     }
 
 }

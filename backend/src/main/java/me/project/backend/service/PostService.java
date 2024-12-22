@@ -1,32 +1,31 @@
 package me.project.backend.service;
 
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Post;
 import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.repository.PostRepository;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper mapper;
+    private final LikeService likeService;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, LikeService likeService) {
         this.postRepository = postRepository;
         this.mapper = mapper;
+        this.likeService = likeService;
     }
 
     public List<PostDTO> findAll() {
         List<Post> all = postRepository.findAll();
-        return mapper.map(all, new TypeToken<List<PostDTO>>() {}.getType());
+        return all.stream().map(this::convertPostToDTOWithReactionAndLikeCount).toList();
     }
 
     public PostDTO save(Post post) {
@@ -39,5 +38,11 @@ public class PostService {
         log.info("find post by id: {}", postId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         return mapper.map(post, PostDTO.class);
+    }
+    private PostDTO convertPostToDTOWithReactionAndLikeCount(Post post) {
+        PostDTO dto = mapper.map(post, PostDTO.class);
+        dto.setReaction(likeService.getUserReactionByPostId(post.getId()));
+        dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
+        return dto;
     }
 }

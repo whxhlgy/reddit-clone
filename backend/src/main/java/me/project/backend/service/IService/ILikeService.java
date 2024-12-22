@@ -6,7 +6,13 @@ public interface ILikeService {
 
    int getUserReactionByCommentId(long commentId);
 
-   LikeDTO likeCommentByCommentId(long commentId, int reaction);
+   int getUserReactionByPostId(long postId);
+
+   LikeDTO likeCommentById(long commentId, int reaction);
+
+   LikeDTO likePostById(long postId, int reaction);
 
    int countLikeByCommentId(long commentId);
+
+   int countLikeByPostId(long postId);
 }
