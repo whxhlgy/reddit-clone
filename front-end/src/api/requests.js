@@ -37,7 +37,13 @@ fetch = ((originFetch) => {
   };
 })(fetch);
 
-export async function get(endpoint) {
+export async function get(endpoint, params) {
+  const url = new URL(endpoint, window.location.origin);
+  if (params) {
+    Object.keys(params).forEach((key) =>
+      url.searchParams.append(key, params[key]),
+    );
+  }
   const options = {
     method: "GET",
   };
@@ -52,10 +58,17 @@ export async function get(endpoint) {
   return data;
 }
 
-export async function post(endpoint, body) {
+export async function post(endpoint, body, params) {
+  const url = new URL(endpoint, window.location.origin);
+  if (params) {
+    Object.keys(params).forEach((key) =>
+      url.searchParams.append(key, params[key]),
+    );
+  }
+
   let data;
   try {
-    data = await fetch(endpoint, {
+    data = await fetch(url, {
       method: "POST",
       body: body ? JSON.stringify(body) : null,
       headers: {
