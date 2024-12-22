@@ -37,10 +37,7 @@ public class LikeService implements ILikeService {
             return 0;
         }
 
-        // check if comment exists
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
-
-        Optional<CommentLike> reaction = commentLikeRepository.findCommentLikeByUsernameAndComment(username.get(), comment);
+        Optional<CommentLike> reaction = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username.get(), commentId);
         Integer r = reaction.map(CommentLike::getReaction).orElse(0);
         log.debug("username:{}, reaction: {}", username.get(), r);
         return r;
@@ -56,11 +53,11 @@ public class LikeService implements ILikeService {
         }
         log.debug("username:{}", username.get());
 
-        // check if comment exists
+        // important, avoid add a like to a not existed comment
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
         // update or insert the like reaction
-        Optional<CommentLike> likeCommentOptional = commentLikeRepository.findCommentLikeByUsernameAndComment(username.get(), comment);
+        Optional<CommentLike> likeCommentOptional = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username.get(), commentId);
         if (likeCommentOptional.isEmpty()) {
             log.debug("Cannot find like record, insert one");
             CommentLike save = commentLikeRepository.save(CommentLike.builder()
