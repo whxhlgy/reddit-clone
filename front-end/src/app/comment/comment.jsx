@@ -1,3 +1,4 @@
+import CommentLike from "@/app/comment/comment-like";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import classNames from "classnames";
 import { CircleMinus, CirclePlus } from "lucide-react";
@@ -56,7 +57,9 @@ const Comment = ({ comment }) => {
           ) : (
             <CirclePlus size="16px" className="ml-1 z-0 bg-feed-background" />
           )}
-          <div></div>
+          <div className="justify-self-start">
+            <CommentLike comment={comment} />
+          </div>
         </div>
 
         {/* children */}

@@ -19,8 +19,17 @@ export default {
           dark: "#434343",
         },
         buttonGray: {
+          sm: "hsl(var(--gray-sm))",
           lg: "hsl(var(--gray-lg))",
           xl: "hsl(var(--gray-xl))",
+        },
+        buttonRed: {
+          normal: "#D63E18",
+          active: "#AC3011",
+        },
+        buttonBlue: {
+          normal: "#695DF8",
+          active: "#513EF7",
         },
         background: "hsl(var(--background))",
         feed: {

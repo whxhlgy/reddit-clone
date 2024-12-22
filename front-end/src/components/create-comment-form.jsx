@@ -19,6 +19,7 @@ const commentSchema = z.object({
     message: "You have not input anything!",
   }),
   username: z.string(),
+  indent: z.string(),
 });
 
 const CommentForm = () => {
@@ -28,6 +29,7 @@ const CommentForm = () => {
     defaultValues: {
       content: "",
       username: user.username,
+      indent: "add",
     },
   });
 
@@ -37,7 +39,6 @@ const CommentForm = () => {
     console.log(values);
     submit(values, {
       method: "post",
-      encType: "application/json",
     });
     form.setValue("content", "");
   }
