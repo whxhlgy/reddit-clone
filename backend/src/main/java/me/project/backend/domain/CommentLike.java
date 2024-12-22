@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LikeComment {
+public class CommentLike {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
