@@ -41,6 +41,11 @@ public class PostService {
         return mapper.map(post, PostDTO.class);
     }
 
+    public List<Post> saveAll(List<Post> posts) {
+        log.debug("bulk save");
+        return postRepository.saveAll(posts);
+    }
+
     public PostDTO saveByCommunityName(String name, PostRequest postRequest) {
         log.info("save post by comm name: {}", postRequest);
         Post map = mapper.map(postRequest, Post.class);
@@ -58,8 +63,11 @@ public class PostService {
 
     public List<PostDTO> findAllByCommunityName(String name) {
         log.debug("find all posts by community name: {}", name);
-        List<Post> posts = postRepository.findPostByCommunityName(name);
-        return posts.stream().map(this::convertPostToDTOWithReactionAndLikeCount).collect(Collectors.toList());
+        List<PostDTO> posts = postRepository.findPostByCommunityName(name);
+        return posts.stream().peek((postDTO -> {
+            postDTO.setReaction(likeService.getUserReactionByPostId(postDTO.getId()));
+            postDTO.setLikeCount(likeService.countLikeByPostId(postDTO.getId()));
+        })).collect(Collectors.toList());
     }
 
     private PostDTO convertPostToDTOWithReactionAndLikeCount(Post post) {

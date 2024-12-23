@@ -14,7 +14,9 @@ public class Post {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String username;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -24,8 +26,6 @@ public class Post {
 
     @Column(columnDefinition = "TEXT")
     private String content;
-
-    private Long likesCount;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
