@@ -6,12 +6,9 @@ import { useState } from "react";
 
 const Comment = ({ comment }) => {
   const [over, setOver] = useState(false);
-  const [expand, setExpand] = useState(true);
+  const expandable = comment.children && comment.children.length > 0;
+  const [expand, setExpand] = useState(expandable === true);
 
-  const onExpand = () => {
-    console.log(`expand: ${expand}`);
-    setExpand(!expand);
-  };
   const children = comment.children;
 
   return (
@@ -31,6 +28,7 @@ const Comment = ({ comment }) => {
             "absolute top-0 left-0 w-6 h-full bg-thread bg-no-repeat bg-center bg-[length:1px]",
             {
               "bg-threadDark": over === true,
+              hidden: expandable === false,
             },
           )}
         ></div>
@@ -38,6 +36,9 @@ const Comment = ({ comment }) => {
         <div
           className={classNames(
             "absolute top-0 left-0 w-6 h-full cursor-pointer z-10",
+            {
+              hidden: expandable === false,
+            },
           )}
           onClick={() => setExpand(!expand)}
           onMouseEnter={() => setOver(true)}
@@ -52,7 +53,9 @@ const Comment = ({ comment }) => {
 
         {/* action row */}
         <div className="contents">
-          {expand ? (
+          {!expandable ? (
+            <div />
+          ) : expand ? (
             <CircleMinus
               size="16px"
               className="justify-self-center self-center z-0 bg-feed-background"
