@@ -3,6 +3,7 @@ package me.project.backend.payload.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.project.backend.domain.User;
 
 @Data
 @NoArgsConstructor

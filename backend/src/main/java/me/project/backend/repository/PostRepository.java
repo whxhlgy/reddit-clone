@@ -14,6 +14,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @EntityGraph(attributePaths = { "user" })
-    @Query("SELECT p.id, p.user.username, p.community.id, p.title, p.content FROM Post p WHERE p.community.name = :community_name")
-    List<PostDTO> findPostByCommunityName(@Param("community_name") String name);
+    List<Post> findPostByCommunityName(String name);
 }

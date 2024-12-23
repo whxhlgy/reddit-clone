@@ -63,17 +63,15 @@ public class PostService {
 
     public List<PostDTO> findAllByCommunityName(String name) {
         log.debug("find all posts by community name: {}", name);
-        List<PostDTO> posts = postRepository.findPostByCommunityName(name);
-        return posts.stream().peek((postDTO -> {
-            postDTO.setReaction(likeService.getUserReactionByPostId(postDTO.getId()));
-            postDTO.setLikeCount(likeService.countLikeByPostId(postDTO.getId()));
-        })).collect(Collectors.toList());
+        List<Post> posts = postRepository.findPostByCommunityName(name);
+        return posts.stream().map(this::convertPostToDTOWithReactionAndLikeCount).collect(Collectors.toList());
     }
 
     private PostDTO convertPostToDTOWithReactionAndLikeCount(Post post) {
         PostDTO dto = mapper.map(post, PostDTO.class);
         dto.setReaction(likeService.getUserReactionByPostId(post.getId()));
         dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
+        dto.setUsername(post.getUser().getUsername());
         return dto;
     }
 }
