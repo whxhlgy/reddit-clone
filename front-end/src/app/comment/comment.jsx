@@ -89,10 +89,9 @@ const Comment = ({ comment }) => {
                       >
                         <div
                           className={classNames(
-                            "absolute w-3 h-3 border-solid border-l-[1px] border-b-[1px] border-b-thread-normal border-l-thread-normal rounded-bl-sm",
+                            "absolute w-3 h-3 border-solid border-l-[1px] border-b-[1px] rounded-bl-sm",
                             {
-                              "border-l-thread-dark border-b-thread-dark":
-                                over === true,
+                              "border-thread-dark": over === true,
                             },
                           )}
                         />
@@ -108,40 +107,6 @@ const Comment = ({ comment }) => {
         </div>
       </div>
     </div>
-  );
-};
-
-const ThreadLine = ({ className, over, setOver, onClick }) => {
-  return (
-    <div
-      className={classNames(
-        className,
-        "bg-thread bg-no-repeat bg-center bg-[length:1px] cursor-pointer",
-        {
-          "bg-threadDark": over === true,
-        },
-      )}
-      onMouseEnter={() => setOver(true)}
-      onMouseOut={() => setOver(false)}
-      onClick={onClick}
-    />
-  );
-};
-
-const ThreadPointer = ({ over, setOver, onClick }) => {
-  return (
-    <div
-      className={classNames(
-        "w-5 h-5 cursor-pointer absolute left-[11.5px] border-solid border-l-[1px] border-b-[1px] border-b-thread-normal border-l-thread-normal rounded-bl-lg",
-        {
-          "border-b-thread-dark": over === true,
-          "border-l-thread-dark": over === true,
-        },
-      )}
-      onMouseEnter={() => setOver(true)}
-      onMouseOut={() => setOver(false)}
-      onClick={onClick}
-    ></div>
   );
 };
 

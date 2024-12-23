@@ -3,13 +3,15 @@ import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { useState } from "react";
 
 const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
-  const [isLike, setReaction] = useState(reaction);
+  const [isLike, setIsLike] = useState(reaction);
+  const [count, setCount] = useState(likeCount);
   console.log(`reaction: ${isLike}`);
-  const onClickReaction = (reaction) => {
+  const onClickReaction = (newReaction) => {
     return (e) => {
       e.preventDefault();
-      onReaction(reaction);
-      setReaction(reaction);
+      onReaction(newReaction);
+      setIsLike(newReaction);
+      setCount(count - isLike + newReaction);
     };
   };
   const like = onClickReaction(1);
@@ -64,7 +66,7 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
           })}
         />
       </Button>
-      <span className="text-xs font-semibold">{likeCount}</span>
+      <span className="text-xs font-semibold">{count}</span>
       <Button
         onClick={isLike === -1 ? noneLike : dislike}
         reaction={isLike}
@@ -98,10 +100,10 @@ function Button({ reaction, onClick, children, size }) {
     <button
       onClick={onClick}
       className={classNames("rounded-[--radius] p-0", {
-        "hover:bg-buttonGray-lg": size === "md" && reaction === 0,
+        "hover:bg-buttonGray-lg":
+          (size === "md" && reaction === 0) || size === "sm",
         "hover:bg-buttonRed-active": size === "md" && reaction === 1,
         "hover:bg-buttonBlue-active": size === "md" && reaction === -1,
-        "hover:bg-buttonGray-md": size === "sm",
       })}
     >
       {children}
