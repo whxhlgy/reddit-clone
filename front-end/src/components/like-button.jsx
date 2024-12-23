@@ -2,9 +2,15 @@ import classNames from "classnames";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 
 const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
-  const like = () => onReaction(1);
-  const dislike = () => onReaction(-1);
-  const noneLike = () => onReaction(0);
+  const onClickReaction = (reaction) => {
+    return (e) => {
+      e.preventDefault();
+      onReaction(reaction);
+    };
+  };
+  const like = onClickReaction(1);
+  const dislike = onClickReaction(-1);
+  const noneLike = onClickReaction(0);
   let buttonSize;
   switch (size) {
     case "sm":
@@ -12,7 +18,7 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
       break;
     case "md":
     default:
-      buttonSize = 16;
+      buttonSize = 24;
       break;
   }
 
@@ -38,9 +44,18 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
         <ArrowBigUp
           strokeWidth={1.25}
           size={buttonSize}
-          color={reaction === 1 ? "#D63E18" : "black"}
+          color={
+            size === "sm"
+              ? reaction === 1
+                ? "#D63E18"
+                : "black"
+              : reaction === 1 || reaction === -1
+                ? "#fff"
+                : "black"
+          }
           className={classNames({
             "fill-white": size === "md" && reaction === 1,
+            "fill-none": size === "md" && reaction === -1,
             "fill-buttonRed-normal": size === "sm" && reaction === 1,
           })}
         />
@@ -52,11 +67,20 @@ const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
         size={size}
       >
         <ArrowBigDown
-          color={reaction === -1 ? "#695DF8" : "black"}
+          color={
+            size === "sm"
+              ? reaction === -1
+                ? "#695DF8"
+                : "black"
+              : reaction === 1 || reaction === -1
+                ? "#fff"
+                : "black"
+          }
           strokeWidth={1.25}
           size={buttonSize}
           className={classNames({
-            "fill-white": size === "md" && reaction === 1,
+            "fill-white": size === "md" && reaction === -1,
+            "fill-none": size === "md" && reaction === 1,
             "fill-buttonBlue-normal": size === "sm" && reaction === -1,
           })}
         />
@@ -73,7 +97,7 @@ function Button({ reaction, onClick, children, size }) {
         "hover:bg-buttonGray-lg": size === "md" && reaction === 0,
         "hover:bg-buttonRed-active": size === "md" && reaction === 1,
         "hover:bg-buttonBlue-active": size === "md" && reaction === -1,
-        "hover:bg-buttonGray-lg": size === "sm",
+        "hover:bg-buttonGray-md": size === "sm",
       })}
     >
       {children}

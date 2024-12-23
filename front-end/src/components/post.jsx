@@ -2,10 +2,21 @@ import LikeButton from "@/components/like-button";
 import { AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useFetcher, useParams } from "react-router-dom";
 
 const Post = ({ post }) => {
+  const fetcher = useFetcher();
+  const onReaction = (reaction) => {
+    fetcher.submit(
+      { intend: "postLike", postId: post.id, reaction },
+      {
+        method: "post",
+      },
+    );
+  };
+
   const { communityName } = useParams();
+  console.log(`post: ${JSON.stringify(post)}`);
   return (
     <div className="flex flex-col items-start gap-2">
       <div className="flex flex-row justify-start gap-2">
@@ -26,7 +37,12 @@ const Post = ({ post }) => {
       <h1 className="text-3xl">{post.title}</h1>
       <p>{post.content}</p>
 
-      <LikeButton post={post} />
+      <LikeButton
+        reaction={post.reaction}
+        likeCount={post.likeCount}
+        onReaction={onReaction}
+        size={"md"}
+      />
     </div>
   );
 };

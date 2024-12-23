@@ -53,11 +53,11 @@ export default function Submit() {
       {
         ...post,
         username: "anonymous",
+        intend: "add",
       },
       {
         method: "post",
         action: `/${COMMUNITY_URL}/${communityName}`,
-        encType: "application/json",
       },
     );
   };

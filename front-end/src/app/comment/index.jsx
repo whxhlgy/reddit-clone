@@ -5,7 +5,7 @@ import CommentForm from "@/components/create-comment-form";
 import { createComment, findAllByPostId } from "@/api/comment";
 import { getPostById } from "@/api/post";
 import Comments from "@/app/comment/comments";
-import { likeComment } from "@/api/like";
+import { likeComment, likePost } from "@/api/like";
 
 export async function loader({ params }) {
   const postId = params.postId;
@@ -19,13 +19,13 @@ export async function action({ params, request }) {
   const formData = Object.fromEntries(await request.formData());
   console.log(`get formData: ${JSON.stringify(formData)}`);
 
-  if (!formData.indent) {
-    throw new Error("can not perform no indent action of comment");
+  if (!formData.intend) {
+    throw new Error("unintended action!");
   }
-  const indent = formData.indent;
-  delete formData.indent;
+  const intend = formData.intend;
+  delete formData.intend;
 
-  switch (indent) {
+  switch (intend) {
     case "add":
       console.debug(`add comment with postId: ${params.postId}`);
       await createComment(params.postId, formData);
@@ -35,6 +35,12 @@ export async function action({ params, request }) {
         `give reaction: ${formData.reaction} to comment with id: ${formData.commentId}`,
       );
       await likeComment(formData.commentId, formData.reaction);
+      break;
+    case "postLike":
+      console.debug(
+        `give reaction: ${formData.reaction} to post with id: ${formData.postId}`,
+      );
+      await likePost(formData.postId, formData.reaction);
       break;
   }
 }

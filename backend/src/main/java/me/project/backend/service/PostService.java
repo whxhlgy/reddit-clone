@@ -37,7 +37,7 @@ public class PostService {
     public PostDTO findById(long postId) {
         log.info("find post by id: {}", postId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-        return mapper.map(post, PostDTO.class);
+        return convertPostToDTOWithReactionAndLikeCount(post);
     }
     private PostDTO convertPostToDTOWithReactionAndLikeCount(Post post) {
         PostDTO dto = mapper.map(post, PostDTO.class);

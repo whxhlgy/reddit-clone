@@ -7,7 +7,7 @@ const CommentLike = ({ comment }) => {
 
   const onReaction = async (reaction) => {
     fetcher.submit(
-      { commentId: comment.id, reaction, indent: "like" },
+      { commentId: comment.id, reaction, intend: "like" },
       {
         method: "post",
       },
