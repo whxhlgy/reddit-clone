@@ -1,7 +1,7 @@
 import LikeButton from "@/components/like-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { Link, useFetcher } from "react-router-dom";
+import { Link, useFetcher, useParams } from "react-router-dom";
 
 export const PostCardWrapper = ({ children, postId }) => {
   return (
@@ -16,11 +16,13 @@ export const PostCardWrapper = ({ children, postId }) => {
 const PostCard = ({ post }) => {
   const fetcher = useFetcher();
 
+  const { communityName } = useParams();
   const onReaction = (reaction) => {
     fetcher.submit(
       { reaction, postId: post.id, intend: "like" },
       {
         method: "post",
+        action: `/r/${communityName}`,
       },
     );
   };

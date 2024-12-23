@@ -5,7 +5,6 @@ import { useState } from "react";
 const LikeButton = ({ reaction, likeCount, onReaction, size }) => {
   const [isLike, setIsLike] = useState(reaction);
   const [count, setCount] = useState(likeCount);
-  console.log(`reaction: ${isLike}`);
   const onClickReaction = (newReaction) => {
     return (e) => {
       e.preventDefault();
