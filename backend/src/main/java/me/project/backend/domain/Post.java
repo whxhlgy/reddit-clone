@@ -16,7 +16,9 @@ public class Post {
 
     private String username;
 
-    private Long communityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Community community;
 
     private String title;
 

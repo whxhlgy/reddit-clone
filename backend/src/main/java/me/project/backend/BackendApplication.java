@@ -39,12 +39,13 @@ public class BackendApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        communityService.save(new Community("webdev", "test_desc"));
+        Community webdev = communityService.save(new Community("webdev", "test_desc"));
         Post post = new Post();
         post.setContent("test");
         post.setTitle("test title");
         post.setUsername("anonymous");
         post.setLikesCount(100L);
+        post.setCommunity(webdev);
         postService.save(post);
 
         Post post2 = new Post();
@@ -52,6 +53,7 @@ public class BackendApplication implements CommandLineRunner {
         post2.setTitle("test title2");
         post2.setUsername("anonymous");
         post2.setLikesCount(100L);
+        post2.setCommunity(webdev);
         PostDTO p2 = postService.save(post2);
 
         CommentDTO c1 = commentService.save(post2.getId(), null, new CommentDTO("I think it is right", "test"));

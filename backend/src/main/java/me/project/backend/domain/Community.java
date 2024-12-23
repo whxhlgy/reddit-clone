@@ -15,7 +15,7 @@ public class Community {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 20)
+    @Column(length = 20, unique = true, nullable = false)
     @NotBlank
     private String name;
 

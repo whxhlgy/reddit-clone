@@ -1,18 +1,19 @@
-import { getPosts } from "@/api/post";
+import { likePost } from "@/api/like";
+import { createPost, getPostByCommunityName } from "@/api/post";
 import Feed from "@/app/community/feed";
-import { createPost } from "@/api/post";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link, useLoaderData } from "react-router-dom";
-import { likePost } from "@/api/like";
 
-export function loader() {
-  const posts = getPosts();
+export function loader({ params }) {
+  const { communityName } = params;
+  const posts = getPostByCommunityName(communityName);
   return posts;
 }
 
-export async function action({ request }) {
+export async function action({ params, request }) {
   const data = Object.fromEntries(await request.formData());
+  const { communityName } = params;
   console.debug(`get formData: ${JSON.stringify(data)}`);
 
   const intend = data.intend;
@@ -20,11 +21,10 @@ export async function action({ request }) {
 
   switch (intend) {
     case "addPost":
-      // TODO:
       console.debug(
-        `add a post(id: ${data.id}) to community: ${"not implemented"}`,
+        `add a post(id: ${data.id}) to community: ${communityName}`,
       );
-      await createPost(data);
+      await createPost(communityName, data);
       break;
     case "like":
       console.debug(`like a post(id: ${data.postId})`);
