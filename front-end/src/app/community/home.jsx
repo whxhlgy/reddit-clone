@@ -19,7 +19,7 @@ export async function action({ request }) {
   delete data.intend;
 
   switch (intend) {
-    case "add":
+    case "addPost":
       // TODO:
       console.debug(
         `add a post(id: ${data.id}) to community: ${"not implemented"}`,

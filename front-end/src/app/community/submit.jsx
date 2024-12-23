@@ -11,7 +11,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { COMMUNITY_URL } from "@/lib/consts";
+import { UserContext } from "@/lib/context";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import {
   redirect,
@@ -46,14 +48,16 @@ export default function Submit() {
     },
   });
 
+  const { username } = useContext(UserContext);
+
   const submit = useSubmit();
 
   const onSubmit = (post) => {
     submit(
       {
         ...post,
-        username: "anonymous",
-        intend: "add",
+        username: username,
+        intend: "addPost",
       },
       {
         method: "post",

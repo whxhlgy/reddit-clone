@@ -54,13 +54,12 @@ const router = createBrowserRouter([
               {
                 path: "r/:communityName",
                 element: <CommLayout />,
+                action: feedAction,
                 children: [
                   // This is for community feed
                   {
-                    loader: communityLoader,
-                    action: feedAction,
-                    // path: "home",
                     index: true,
+                    loader: communityLoader,
                     element: <CommunityHome />,
                   },
                   {
