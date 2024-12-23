@@ -4,8 +4,8 @@ export function getPosts() {
   return get("/api/posts");
 }
 
-export function getPostByCommunityName(name) {
-  return get(`/api/posts/community/${name}`);
+export function getPostByCommunityName(name, params) {
+  return get(`/api/posts/community/${name}`, params);
 }
 
 export function getPostById(postId) {

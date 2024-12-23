@@ -40,8 +40,8 @@ fetch = ((originFetch) => {
 export async function get(endpoint, params) {
   const url = new URL(endpoint, window.location.origin);
   if (params) {
-    Object.keys(params).forEach((key) =>
-      url.searchParams.append(key, params[key]),
+    Object.keys(params).forEach(
+      (key) => params[key] && url.searchParams.append(key, params[key]),
     );
   }
   const options = {
@@ -50,7 +50,7 @@ export async function get(endpoint, params) {
 
   let data;
   try {
-    data = await fetch(endpoint, options);
+    data = await fetch(url, options);
   } catch (e) {
     console.error(`Get failed: ${e.message}`);
     throw e;
@@ -61,8 +61,8 @@ export async function get(endpoint, params) {
 export async function post(endpoint, body, params) {
   const url = new URL(endpoint, window.location.origin);
   if (params) {
-    Object.keys(params).forEach((key) =>
-      url.searchParams.append(key, params[key]),
+    Object.keys(params).forEach(
+      (key) => params[key] && url.searchParams.append(key, params[key]),
     );
   }
 

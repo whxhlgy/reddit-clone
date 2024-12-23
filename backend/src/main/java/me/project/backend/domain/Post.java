@@ -3,7 +3,10 @@ package me.project.backend.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,12 @@ public class Post {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public void addComment(Comment comment) {
         comments.add(comment);

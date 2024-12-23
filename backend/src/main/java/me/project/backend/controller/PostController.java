@@ -17,14 +17,17 @@ public class PostController {
         this.postService = postService;
     }
 
+    // DECRYPTED
     @GetMapping
     public List<PostDTO> findAll() {
         return postService.findAll();
     }
 
     @GetMapping("/community/{name}")
-    public List<PostDTO> findAllByCommunity(@PathVariable String name) {
-        return postService.findAllByCommunityName(name);
+    public List<PostDTO> findAllByCommunity(@PathVariable String name,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+        return postService.findAllByCommunityName(name, page, size);
     }
 
     @GetMapping("/{postId}")

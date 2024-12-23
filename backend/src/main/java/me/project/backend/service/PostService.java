@@ -3,13 +3,20 @@ package me.project.backend.service;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Community;
 import me.project.backend.domain.Post;
+import me.project.backend.domain.User;
 import me.project.backend.exception.notFound.CommunityNotFoundException;
 import me.project.backend.exception.notFound.PostNotFoundException;
+import me.project.backend.exception.notFound.UserNotFoundException;
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.payload.request.PostRequest;
 import me.project.backend.repository.CommunityRepository;
 import me.project.backend.repository.PostRepository;
+import me.project.backend.repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +29,14 @@ public class PostService {
     private final ModelMapper mapper;
     private final LikeService likeService;
     private final CommunityRepository communityRepository;
+    private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper, LikeService likeService, CommunityRepository communityRepository) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, LikeService likeService, CommunityRepository communityRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.likeService = likeService;
         this.communityRepository = communityRepository;
+        this.userRepository = userRepository;
     }
 
     public List<PostDTO> findAll() {
@@ -48,10 +57,12 @@ public class PostService {
 
     public PostDTO saveByCommunityName(String name, PostRequest postRequest) {
         log.info("save post by comm name: {}", postRequest);
-        Post map = mapper.map(postRequest, Post.class);
+        Post post = mapper.map(postRequest, Post.class);
         Community community = communityRepository.findByName(name).orElseThrow(() -> new CommunityNotFoundException(name));
-        map.setCommunity(community);
-        Post save = postRepository.save(map);
+        User user = userRepository.findByUsername(postRequest.getUsername()).orElseThrow(() -> new UserNotFoundException(postRequest.getUsername()));
+        post.setCommunity(community);
+        post.setUser(user);
+        Post save = postRepository.save(post);
         return mapper.map(save, PostDTO.class);
     }
 
@@ -61,9 +72,11 @@ public class PostService {
         return convertPostToDTOWithReactionAndLikeCount(post);
     }
 
-    public List<PostDTO> findAllByCommunityName(String name) {
-        log.debug("find all posts by community name: {}", name);
-        List<Post> posts = postRepository.findPostByCommunityName(name);
+    public List<PostDTO> findAllByCommunityName(String name, int page, int size) {
+        log.debug("find all posts by community name: {}, page: {}, size: {}", name, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postRepository.findAllByCommunityName(pageable, name);
         return posts.stream().map(this::convertPostToDTOWithReactionAndLikeCount).collect(Collectors.toList());
     }
 

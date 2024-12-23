@@ -1,19 +1,20 @@
 import LikeButton from "@/components/like-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
+import React from "react";
 import { Link, useFetcher, useParams } from "react-router-dom";
 
-export const PostCardWrapper = ({ children, postId }) => {
+export const PostCardWrapper = React.forwardRef(({ children, postId }, ref) => {
   return (
-    <div className="border-t-[1px] last:border-b-[1px] py-1">
+    <div ref={ref} className="border-t-[1px] last:border-b-[1px] py-1">
       <div className="hover:bg-buttonGray-sm rounded-[--radius]">
         <Link to={`comments/${postId}`}>{children}</Link>
       </div>
     </div>
   );
-};
+});
 
-const PostCard = ({ post }) => {
+const PostCard = React.forwardRef(({ post }, ref) => {
   const fetcher = useFetcher();
 
   const { communityName } = useParams();
@@ -27,7 +28,7 @@ const PostCard = ({ post }) => {
     );
   };
   return (
-    <PostCardWrapper postId={post.id}>
+    <PostCardWrapper postId={post.id} ref={ref}>
       <div className="rounded-xl flex flex-col">
         {/* Header */}
         <div className="flex flex-row items-center gap-2">
@@ -55,6 +56,6 @@ const PostCard = ({ post }) => {
       </div>
     </PostCardWrapper>
   );
-};
+});
 
 export default PostCard;

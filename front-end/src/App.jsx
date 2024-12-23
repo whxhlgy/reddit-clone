@@ -52,23 +52,22 @@ const router = createBrowserRouter([
               },
               // This is for community info
               {
-                path: "r/:communityName",
                 element: <CommLayout />,
-                action: feedAction,
                 children: [
                   // This is for community feed
                   {
-                    index: true,
+                    path: "r/:communityName",
+                    action: feedAction,
                     loader: communityLoader,
                     element: <CommunityHome />,
                   },
                   {
-                    path: "submit",
+                    path: "r/:communityName/submit",
                     element: <Submit />,
                     loader: feedSubmitLoader,
                   },
                   {
-                    path: "comments/:postId",
+                    path: "r/:communityName/comments/:postId",
                     element: <CommentsIndex />,
                     loader: commentLoader,
                     action: commentAction,
