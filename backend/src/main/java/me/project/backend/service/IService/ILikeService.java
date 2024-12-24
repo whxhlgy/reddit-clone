@@ -5,15 +5,15 @@ import me.project.backend.payload.request.LikeRequest;
 
 public interface ILikeService {
 
-   int getUserReactionByCommentId(long commentId);
+   int getUserReactionByCommentId(String username, long commentId);
 
-   int getUserReactionByPostId(long postId);
+   int getUserReactionByPostId(String username, long postId);
 
    LikeDTO likeCommentById(long commentId, LikeRequest likeRequest);
 
    LikeDTO likePostById(long postId, LikeRequest likeRequest);
 
-   int countLikeByCommentId(long commentId);
+   long countLikeByCommentId(long commentId);
 
-   int countLikeByPostId(long postId);
+   long countLikeByPostId(long postId);
 }

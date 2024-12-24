@@ -7,16 +7,18 @@ import me.project.backend.domain.User;
 import me.project.backend.exception.notFound.CommunityNotFoundException;
 import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.exception.notFound.UserNotFoundException;
+import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.payload.request.PostRequest;
 import me.project.backend.repository.CommunityRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.repository.UserRepository;
+import me.project.backend.service.IService.ILikeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +29,11 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper mapper;
-    private final LikeService likeService;
+    private final ILikeService likeService;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper, LikeService likeService, CommunityRepository communityRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.likeService = likeService;
@@ -41,7 +43,9 @@ public class PostService {
 
     public List<PostDTO> findAll() {
         List<Post> all = postRepository.findAll();
-        return all.stream().map(this::convertPostToDTOWithReactionAndLikeCount).toList();
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        return all.stream().map((post -> convertPostToDTOWithReactionAndLikeCount(username, post))).toList();
     }
 
     public PostDTO save(Post post) {
@@ -69,7 +73,9 @@ public class PostService {
     public PostDTO findById(long postId) {
         log.info("find post by id: {}", postId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-        return convertPostToDTOWithReactionAndLikeCount(post);
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        return convertPostToDTOWithReactionAndLikeCount(username, post);
     }
 
     public List<PostDTO> findAllByCommunityName(String name, int page, int size) {
@@ -77,12 +83,14 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postRepository.findAllByCommunityName(pageable, name);
-        return posts.stream().map(this::convertPostToDTOWithReactionAndLikeCount).collect(Collectors.toList());
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        return posts.stream().map(post -> convertPostToDTOWithReactionAndLikeCount(username, post)).collect(Collectors.toList());
     }
 
-    private PostDTO convertPostToDTOWithReactionAndLikeCount(Post post) {
+    private PostDTO convertPostToDTOWithReactionAndLikeCount(String username, Post post) {
         PostDTO dto = mapper.map(post, PostDTO.class);
-        dto.setReaction(likeService.getUserReactionByPostId(post.getId()));
+        dto.setReaction(likeService.getUserReactionByPostId(username, post.getId()));
         dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
         dto.setUsername(post.getUser().getUsername());
         return dto;

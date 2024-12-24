@@ -7,12 +7,14 @@ import me.project.backend.domain.CommentClosure;
 import me.project.backend.domain.Post;
 import me.project.backend.exception.notFound.CommentNotFoundException;
 import me.project.backend.exception.notFound.PostNotFoundException;
+import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.payload.dto.CommentDTO;
 import me.project.backend.repository.CommentClosureRepository;
 import me.project.backend.repository.CommentRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.service.IService.ILikeService;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,10 +42,12 @@ public class CommentService {
     public List<CommentDTO> findAllByPostId(long postId) {
         List<Comment> comments = commentRepository.findCommentsByPostId(postId);
         List<CommentDTO> commentDTOs = new ArrayList<>();
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
         for (Comment comment : comments) {
             if (Objects.equals(comment.getParentId(), null)) {
-                CommentDTO commentDTO = convertCommentToDTOWithReactionAndLikeCount(comment);
-                buildTree(commentDTO, comments);
+                CommentDTO commentDTO = convertCommentToDTOWithReactionAndLikeCount(username, comment);
+                buildTree(username, commentDTO, comments);
                 commentDTOs.add(commentDTO);
             }
         }
@@ -51,18 +55,20 @@ public class CommentService {
     }
 
     public CommentDTO findAllByAncestorId(long ancestorId) {
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
         Comment ancestor = commentRepository.findById(ancestorId).orElseThrow(() -> new CommentNotFoundException(ancestorId));
         List<Comment> descendants = commentRepository.findCommentByAncestorId(ancestorId);
-        CommentDTO tree = convertCommentToDTOWithReactionAndLikeCount(ancestor);
-        buildTree(tree, descendants);
+        CommentDTO tree = convertCommentToDTOWithReactionAndLikeCount(username, ancestor);
+        buildTree(username, tree, descendants);
         return tree;
     }
 
-    private void buildTree(CommentDTO ancestor, List<Comment> descendants) {
+    private void buildTree(String username, CommentDTO ancestor, List<Comment> descendants) {
         for (Comment comment : descendants) {
             if (Objects.equals(comment.getParentId(), ancestor.getId())) {
-                CommentDTO child = convertCommentToDTOWithReactionAndLikeCount(comment);
-                buildTree(child, descendants);
+                CommentDTO child = convertCommentToDTOWithReactionAndLikeCount(username, comment);
+                buildTree(username, child, descendants);
                 ancestor.getChildren().add(child);
             }
         }
@@ -96,9 +102,9 @@ public class CommentService {
         }
     }
 
-    private CommentDTO convertCommentToDTOWithReactionAndLikeCount(Comment comment) {
+    private CommentDTO convertCommentToDTOWithReactionAndLikeCount(String username, Comment comment) {
         CommentDTO dto = modelMapper.map(comment, CommentDTO.class);
-        dto.setReaction(likeService.getUserReactionByCommentId(comment.getId()));
+        dto.setReaction(likeService.getUserReactionByCommentId(username, comment.getId()));
         dto.setLikeCount(likeService.countLikeByCommentId(comment.getId()));
         return dto;
     }

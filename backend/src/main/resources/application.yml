@@ -1,5 +1,5 @@
 spring:
-#  autoconfigure:
+  #  autoconfigure:
 #    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   application:
     name: reddit-backend
@@ -18,6 +18,10 @@ spring:
   output:
     ansi:
       enabled: always
+  data:
+    redis:
+      host: redis
+      port: 6379
 logging:
   level:
     me.project: DEBUG

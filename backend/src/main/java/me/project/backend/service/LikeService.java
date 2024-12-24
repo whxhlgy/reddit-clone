@@ -1,7 +1,9 @@
 package me.project.backend.service;
 
+import jakarta.annotation.Nonnull;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Comment;
 import me.project.backend.domain.CommentLike;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
 @Slf4j
 public class LikeService implements ILikeService {
 
@@ -42,30 +43,20 @@ public class LikeService implements ILikeService {
     }
 
     @Override
-    public int getUserReactionByCommentId(long commentId){
+    public int getUserReactionByCommentId(@Nonnull String username, long commentId){
         log.debug("get reaction commentId:{}", commentId);
-        Optional<String> username = ContextUtil.getUsername();
-        if (username.isEmpty()) {
-            return 0;
-        }
-
-        Optional<CommentLike> reaction = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username.get(), commentId);
+        Optional<CommentLike> reaction = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username, commentId);
         Integer r = reaction.map(CommentLike::getReaction).orElse(0);
-        log.debug("commentReaction is { username:{}, reaction: {}}", username.get(), r);
+        log.debug("commentReaction is { username:{}, reaction: {}}", username, r);
         return r;
     }
 
     @Override
-    public int getUserReactionByPostId(long postId) {
+    public int getUserReactionByPostId(@Nonnull String username, long postId) {
         log.debug("get reaction postId:{}", postId);
-        Optional<String> username = ContextUtil.getUsername();
-        if (username.isEmpty()) {
-            return 0;
-        }
-
-        Optional<PostLike> reaction = postLikeRepository.findPostLikeByUsernameAndPostId(username.get(), postId);
+        Optional<PostLike> reaction = postLikeRepository.findPostLikeByUsernameAndPostId(username, postId);
         Integer r = reaction.map(PostLike::getReaction).orElse(0);
-        log.debug("postReaction is { username:{}, reaction: {}}", username.get(), r);
+        log.debug("postReaction is { username:{}, reaction: {}}", username, r);
         return r;
     }
 
@@ -127,13 +118,13 @@ public class LikeService implements ILikeService {
     }
 
     @Override
-    public int countLikeByCommentId(long commentId) {
+    public long countLikeByCommentId(long commentId) {
         log.debug("countLike commentId:{}", commentId);
         return commentLikeRepository.sumCommentLikeByCommentId(commentId).orElse(0);
     }
 
     @Override
-    public int countLikeByPostId(long postId) {
+    public long countLikeByPostId(long postId) {
         log.debug("countLike postId:{}", postId);
         return postLikeRepository.sumPostLikeByCommentId(postId).orElse(0);
     }
