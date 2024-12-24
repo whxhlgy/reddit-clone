@@ -34,13 +34,13 @@ export async function action({ params, request }) {
       console.debug(
         `give reaction: ${formData.reaction} to comment with id: ${formData.commentId}`,
       );
-      await likeComment(formData.commentId, formData.reaction);
+      await likeComment(formData.commentId, formData);
       break;
     case "postLike":
       console.debug(
         `give reaction: ${formData.reaction} to post with id: ${formData.postId}`,
       );
-      await likePost(formData.postId, formData.reaction);
+      await likePost(formData.postId, formData);
       break;
   }
 }

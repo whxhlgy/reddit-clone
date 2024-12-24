@@ -1,8 +1,8 @@
 import { getPostByCommunityName } from "@/api/post";
 import PostCard from "@/components/post-card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useFetcher, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Feed = ({ posts: _posts }) => {
   const [posts, setPosts] = useState(_posts);

@@ -34,7 +34,7 @@ export async function action({ params, request }) {
       break;
     case "like":
       console.debug(`like a post(id: ${data.postId})`);
-      await likePost(data.postId, data.reaction);
+      await likePost(data.postId, data);
       break;
     default:
       throw new Error("unintended action");

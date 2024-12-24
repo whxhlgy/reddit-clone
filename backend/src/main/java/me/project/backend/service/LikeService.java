@@ -1,6 +1,7 @@
 package me.project.backend.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Comment;
 import me.project.backend.domain.CommentLike;
@@ -10,6 +11,7 @@ import me.project.backend.exception.ServiceRuntimeException;
 import me.project.backend.exception.notFound.CommentNotFoundException;
 import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.payload.dto.LikeDTO;
+import me.project.backend.payload.request.LikeRequest;
 import me.project.backend.repository.CommentRepository;
 import me.project.backend.repository.CommentLikeRepository;
 import me.project.backend.repository.PostLikeRepository;
@@ -69,24 +71,20 @@ public class LikeService implements ILikeService {
 
     @Transactional
     @Override
-    public LikeDTO likeCommentById(long commentId, int reaction) {
+    public LikeDTO likeCommentById(long commentId, LikeRequest likeRequest) {
         log.debug("Like a comment with commentId: {}, ", commentId);
-        Optional<String> username = ContextUtil.getUsername();
-        if (username.isEmpty()) {
-            throw new ServiceRuntimeException("Cannot find username" +
-                    "in an authenticated request, this is impossible, so there is must some thing bad happened");
-        }
-        log.debug("like comment by username:{}", username.get());
+        String username = likeRequest.getUsername();
+        int reaction = likeRequest.getReaction();
 
         // important, avoid add a like to a not existed comment
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
         // update or insert the like reaction
-        Optional<CommentLike> likeCommentOptional = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username.get(), commentId);
+        Optional<CommentLike> likeCommentOptional = commentLikeRepository.findCommentLikeByUsernameAndCommentId(username, commentId);
         if (likeCommentOptional.isEmpty()) {
             log.debug("Cannot find comment like record, insert one");
             CommentLike save = commentLikeRepository.save(CommentLike.builder()
-                    .username(username.get())
+                    .username(username)
                     .comment(comment)
                     .reaction(reaction)
                     .build());
@@ -101,24 +99,20 @@ public class LikeService implements ILikeService {
     }
 
     @Override
-    public LikeDTO likePostById(long postId, int reaction) {
+    public LikeDTO likePostById(long postId, @Valid LikeRequest likeRequest) {
         log.debug("Like a post with postId: {}, ", postId);
-        Optional<String> username = ContextUtil.getUsername();
-        if (username.isEmpty()) {
-            throw new ServiceRuntimeException("Cannot find username" +
-                    "in an authenticated request, this is impossible, so there is must some thing bad happened");
-        }
-        log.debug("like post by username:{}", username.get());
+        String username = likeRequest.getUsername();
+        int reaction = likeRequest.getReaction();
 
         // important, avoid add a like to a not existed post
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         // update or insert the like reaction
-        Optional<PostLike> postLikeOpt = postLikeRepository.findPostLikeByUsernameAndPostId(username.get(), postId);
+        Optional<PostLike> postLikeOpt = postLikeRepository.findPostLikeByUsernameAndPostId(username, postId);
         if (postLikeOpt.isEmpty()) {
             log.debug("Cannot find post like record, insert one");
             PostLike save = postLikeRepository.save(PostLike.builder()
-                    .username(username.get())
+                    .username(username)
                     .post(post)
                     .reaction(reaction)
                     .build());

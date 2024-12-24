@@ -1,14 +1,17 @@
 import LikeButton from "@/components/like-button";
 import { AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { UserContext } from "@/lib/context";
 import { ArrowLeft } from "lucide-react";
+import { useContext } from "react";
 import { Link, useFetcher, useParams } from "react-router-dom";
 
 const Post = ({ post }) => {
   const fetcher = useFetcher();
+  const { username } = useContext(UserContext);
   const onReaction = (reaction) => {
     fetcher.submit(
-      { intend: "postLike", postId: post.id, reaction },
+      { intend: "postLike", postId: post.id, reaction, username },
       {
         method: "post",
       },

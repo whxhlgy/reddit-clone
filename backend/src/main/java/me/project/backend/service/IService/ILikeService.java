@@ -1,6 +1,7 @@
 package me.project.backend.service.IService;
 
 import me.project.backend.payload.dto.LikeDTO;
+import me.project.backend.payload.request.LikeRequest;
 
 public interface ILikeService {
 
@@ -8,9 +9,9 @@ public interface ILikeService {
 
    int getUserReactionByPostId(long postId);
 
-   LikeDTO likeCommentById(long commentId, int reaction);
+   LikeDTO likeCommentById(long commentId, LikeRequest likeRequest);
 
-   LikeDTO likePostById(long postId, int reaction);
+   LikeDTO likePostById(long postId, LikeRequest likeRequest);
 
    int countLikeByCommentId(long commentId);
 
