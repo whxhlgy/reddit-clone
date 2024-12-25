@@ -20,6 +20,7 @@ import CommentsIndex, {
   action as commentAction,
   loader as commentLoader,
 } from "@/app/comment";
+import { action as signupAction, SignUpForm } from "@/components/signup-form";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,8 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: <LoginPage />,
+    action: signupAction,
+    element: <SignUpForm />,
   },
   {
     element: <Layout />,

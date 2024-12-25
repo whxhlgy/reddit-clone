@@ -1,21 +1,32 @@
-import { Link, useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 
+import { signup } from "@/api/auth";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { ActionFunctionArgs, redirect } from "react-router-dom";
+import { toast } from "sonner";
 import { z } from "zod";
 
-export function LoginForm() {
+export const action = async ({ request }: ActionFunctionArgs) => {
+  try {
+    const formData = Object.fromEntries(await request.formData());
+    const res = await signup(formData);
+    console.log(`sign up res: ${res}`);
+    // return { ok: true, error: null };
+    return redirect(`/home`);
+  } catch (error) {
+    console.debug(error);
+    toast.error(error.message);
+    return { ok: false, errorCode: error.errorCode };
+  }
+};
+
+export function SignUpForm() {
   const fetcher = useFetcher();
   const formSchema = z.object({
     username: z.string().min(2).max(20, {
@@ -44,7 +55,6 @@ export function LoginForm() {
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     await fetcher.submit(value, {
       method: "post",
-      encType: "application/json",
     });
   };
 
@@ -63,10 +73,7 @@ export function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>
-          Enter your Username below to login to your account
-        </CardDescription>
+        <CardTitle className="text-2xl">Signup</CardTitle>
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -98,15 +105,9 @@ export function LoginForm() {
             )}
           </div>
           <Button type="submit" className="w-full">
-            Login
+            SignUp
           </Button>
         </form>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link to="/signup" className="underline">
-            Sign up
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );

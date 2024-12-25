@@ -8,7 +8,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     console.debug("login action");
     const formData = await request.json();
     const res = await login(formData);
-    localStorage.setItem("access_token", res.access_token);
     // return { ok: true, error: null };
     return redirect(`/home`);
   } catch (error) {

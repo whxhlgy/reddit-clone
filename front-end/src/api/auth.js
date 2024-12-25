@@ -7,3 +7,7 @@ export function login(data) {
 export function signout() {
   return post("/api/auth/signout");
 }
+
+export function signup(data) {
+  return post("/api/auth/signup", data);
+}
