@@ -34,15 +34,16 @@ public class PostService {
     private final ILikeService likeService;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
-    private final StringRedisTemplate stringRedisTemplate;
+    private final PostCacheService postCacheService;
+    private final int POST_CACHE_THRESHOLD = 1;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository, StringRedisTemplate stringRedisTemplate) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository, PostCacheService postCacheService) {
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.likeService = likeService;
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
-        this.stringRedisTemplate = stringRedisTemplate;
+        this.postCacheService = postCacheService;
     }
 
     public List<PostDTO> findAll() {
@@ -52,12 +53,14 @@ public class PostService {
         return all.stream().map((post -> convertPostToDTOWithReactionAndLikeCount(username, post))).toList();
     }
 
+    @Deprecated
     public PostDTO save(Post post) {
         log.info("save post: {}", post);
         Post save = postRepository.save(post);
         return mapper.map(post, PostDTO.class);
     }
 
+    @Deprecated
     public List<Post> saveAll(List<Post> posts) {
         log.debug("bulk save");
         return postRepository.saveAll(posts);
@@ -76,10 +79,24 @@ public class PostService {
 
     public PostDTO findById(long postId) {
         log.info("find post by id: {}", postId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = principal.getUsername();
-        increaseViewCount(postId, username);
+        log.debug("try to get post by id from cache: {}", postId);
+        PostDTO postDTO = postCacheService.getPost(postId);
+        if (postDTO != null) {
+            postDTO.setViewCount(postCacheService.getViewCount(postDTO.getId()));
+            postDTO.setReaction(likeService.getUserReactionByPostId(username, postDTO.getId()));
+            postDTO.setLikeCount(likeService.countLikeByPostId(postDTO.getId()));
+            return postDTO;
+        }
+        log.debug("failed, retry get post by id from db: {}", postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+        long viewCount = postCacheService.increaseViewCount(postId, username);
+        if (viewCount >= POST_CACHE_THRESHOLD) {
+            log.debug("The post(id: {}) view count exceeds the threshold of {}, try cache it", postId, POST_CACHE_THRESHOLD);
+            postCacheService.savePost(post);
+        }
         return convertPostToDTOWithReactionAndLikeCount(username, post);
     }
 
@@ -98,16 +115,7 @@ public class PostService {
         dto.setReaction(likeService.getUserReactionByPostId(username, post.getId()));
         dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
         dto.setUsername(post.getUser().getUsername());
-        dto.setViewCount(getViewCount(post.getId()));
+        dto.setViewCount(postCacheService.getViewCount(post.getId()));
         return dto;
-    }
-
-    private void increaseViewCount(long postId, String username) {
-        String key = RedisKeys.getPostViewKey(postId);
-        stringRedisTemplate.opsForHyperLogLog().add(key, username);
-    }
-    private long getViewCount(long postId) {
-        String key = RedisKeys.getPostViewKey(postId);
-        return stringRedisTemplate.opsForHyperLogLog().size(key);
     }
 }

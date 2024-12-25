@@ -1,6 +1,7 @@
 package me.project.backend.payload.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.project.backend.domain.User;
@@ -8,6 +9,7 @@ import me.project.backend.domain.User;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PostDTO {
     private Long id;
 
