@@ -8,4 +8,12 @@ public class RedisKeys {
     static public String getPostKey(long postId){
         return "cache:post:" + postId;
     }
+
+    static public String getTimelineKey(String username) {
+        return "timeline:" + username;
+    }
+
+    static public String getCommTimelineKey(String communityName) {
+        return "CommTimeline:" + communityName;
+    }
 }

@@ -93,7 +93,6 @@ public class LikeServiceUseCache implements ILikeService {
         log.debug("count like by postId: {}", postId);
         Long likeCount = Objects.requireNonNullElse(redisTemplate.opsForSet().size(getLikeKey(postId, POST_TYPE)), 0L);
         Long dislikeCount = Objects.requireNonNullElse(redisTemplate.opsForSet().size(getDislikeKey(postId, POST_TYPE)), 0L);
-        log.debug("like count: key {} -> {}, dislike count: key {} -> {}", getLikeKey(postId, POST_TYPE), likeCount, getDislikeKey(postId, POST_TYPE), dislikeCount);
         return likeCount - dislikeCount;
     }
 }

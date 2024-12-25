@@ -1,6 +1,7 @@
 package me.project.backend.repository;
 
 import me.project.backend.domain.Subscription;
+import me.project.backend.domain.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ SELECT s FROM Subscription s WHERE s.user.username = :username
 """)
     List<Subscription> findAllWithCommunityByUserId(@Param("username") String username);
 
+    @EntityGraph(attributePaths = { "user" })
+    List<Subscription> findAllByCommunityId(Long communityId);
 }

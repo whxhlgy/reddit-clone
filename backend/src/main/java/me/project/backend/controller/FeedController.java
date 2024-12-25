@@ -2,10 +2,7 @@ package me.project.backend.controller;
 
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.service.FeedService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,7 +16,7 @@ public class FeedController {
     }
 
     @GetMapping("/timeline/{username}")
-    public List<PostDTO> timeline(@PathVariable String username){
-        return feedService.getUserTimeLine(username);
+    public List<PostDTO> timeline(@PathVariable String username, @RequestParam int page, @RequestParam int size) {
+        return feedService.getUserTimeLine(username, page, size);
     }
 }

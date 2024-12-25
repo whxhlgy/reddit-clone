@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static me.project.backend.service.FeedService.getPostDTO;
+
 @Service
 @Slf4j
 public class PostService {
@@ -36,14 +38,16 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostCacheService postCacheService;
     private final int POST_CACHE_THRESHOLD = 1;
+    private final FeedService feedService;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository, PostCacheService postCacheService) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository, PostCacheService postCacheService, FeedService feedService) {
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.likeService = likeService;
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
         this.postCacheService = postCacheService;
+        this.feedService = feedService;
     }
 
     public List<PostDTO> findAll() {
@@ -74,6 +78,7 @@ public class PostService {
         post.setCommunity(community);
         post.setUser(user);
         Post save = postRepository.save(post);
+        feedService.savePostForFeed(community.getId(), post.getId());
         return mapper.map(save, PostDTO.class);
     }
 
@@ -111,11 +116,7 @@ public class PostService {
     }
 
     private PostDTO convertPostToDTOWithReactionAndLikeCount(String username, Post post) {
-        PostDTO dto = mapper.map(post, PostDTO.class);
-        dto.setReaction(likeService.getUserReactionByPostId(username, post.getId()));
-        dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
-        dto.setUsername(post.getUser().getUsername());
-        dto.setViewCount(postCacheService.getViewCount(post.getId()));
-        return dto;
+        return getPostDTO(username, post, mapper, likeService, postCacheService);
     }
+
 }

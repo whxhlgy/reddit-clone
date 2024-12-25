@@ -1,8 +1,6 @@
 package me.project.backend.repository;
 
-import jakarta.persistence.Entity;
 import me.project.backend.domain.Post;
-import me.project.backend.payload.dto.PostDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -20,4 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @EntityGraph(attributePaths = { "user" })
     Page<Post> findAllByCommunityName(Pageable pageable, String communityName);
+
+    @EntityGraph(attributePaths = { "user" })
+    @Query("SELECT p FROM Post p WHERE p.id IN :ids")
+    List<Post> findAllInIds(@Param("ids") List<Long> ids);
 }
