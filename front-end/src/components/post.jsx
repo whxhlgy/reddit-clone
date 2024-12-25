@@ -34,7 +34,7 @@ const Post = ({ post }) => {
             <AvatarFallback>{getInitials(post.username)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col justify-center text-xs">
-            <p className="font-bold">comm name</p>
+            <p className="font-bold">{communityName}</p>
             <p>{post.username}</p>
           </div>
         </div>
