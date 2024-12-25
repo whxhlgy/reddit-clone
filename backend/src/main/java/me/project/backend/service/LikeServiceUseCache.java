@@ -74,7 +74,7 @@ public class LikeServiceUseCache implements ILikeService {
         log.debug("like Post By id: {}, request body: {}", postId, likeRequest);
         String username = likeRequest.getUsername();
         int reaction = likeRequest.getReaction();
-        if (updateReaction(COMMENT_TYPE, String.valueOf(postId), String.valueOf(reaction), username)) {
+        if (updateReaction(POST_TYPE, String.valueOf(postId), String.valueOf(reaction), username)) {
             return new LikeDTO(username, reaction, LikeDTO.Type.POST);
         } else {
             throw new ServiceRuntimeException("Like comment error");
@@ -90,8 +90,10 @@ public class LikeServiceUseCache implements ILikeService {
 
     @Override
     public long countLikeByPostId(long postId) {
+        log.debug("count like by postId: {}", postId);
         Long likeCount = Objects.requireNonNullElse(redisTemplate.opsForSet().size(getLikeKey(postId, POST_TYPE)), 0L);
         Long dislikeCount = Objects.requireNonNullElse(redisTemplate.opsForSet().size(getDislikeKey(postId, POST_TYPE)), 0L);
+        log.debug("like count: key {} -> {}, dislike count: key {} -> {}", getLikeKey(postId, POST_TYPE), likeCount, getDislikeKey(postId, POST_TYPE), dislikeCount);
         return likeCount - dislikeCount;
     }
 }
