@@ -48,7 +48,7 @@ public class SubscriptionService {
         String username = ContextUtil.getUsername().orElseThrow(() -> new ServiceRuntimeException("cannot get username"));
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
-        Community community = communityRepository.findByName(communityName).orElseThrow(() -> new CommunityNotFoundException("cannot get community"));
+        Community community = communityRepository.findByName(communityName).orElseThrow(() -> new CommunityNotFoundException("Cannot get community " + communityName));
 
         Subscription subscription = new Subscription();
         subscription.setUser(user);

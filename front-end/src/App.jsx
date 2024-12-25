@@ -5,7 +5,7 @@ import Home from "@/app/home";
 import "./App.css";
 import CommunityHome, {
   action as feedAction,
-  loader as communityLoader,
+  loader as feedLoader,
 } from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
 import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
@@ -15,7 +15,7 @@ import SideBarLayout, {
   action as sideBarAction,
   loader as sideBarLoader,
 } from "@/app/sidebar-layout";
-import CommLayout from "@/app/comm-layout";
+import CommLayout, { loader as communityLoader } from "@/app/comm-layout";
 import CommentsIndex, {
   action as commentAction,
   loader as commentLoader,
@@ -55,12 +55,13 @@ const router = createBrowserRouter([
               // This is for community info
               {
                 element: <CommLayout />,
+                loader: communityLoader,
                 children: [
                   // This is for community feed
                   {
                     path: "r/:communityName",
                     action: feedAction,
-                    loader: communityLoader,
+                    loader: feedLoader,
                     element: <CommunityHome />,
                   },
                   {

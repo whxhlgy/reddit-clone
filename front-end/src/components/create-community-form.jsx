@@ -42,10 +42,12 @@ const CreateCommunityForm = ({ closeDialog }) => {
   const { data, state } = fetcher;
 
   const onSubmit = async (value) => {
-    await fetcher.submit(value, {
-      method: "post",
-      encType: "application/json",
-    });
+    await fetcher.submit(
+      { ...value, intend: "create" },
+      {
+        method: "post",
+      },
+    );
   };
 
   useEffect(() => {
