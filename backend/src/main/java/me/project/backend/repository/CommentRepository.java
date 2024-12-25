@@ -39,4 +39,6 @@ WHERE c.id = cc.descendant.id
 """
     )
     List<Comment> findCommentsByPostId(@Param("post_id") Long id);
+
+
 }

@@ -22,6 +22,8 @@ public class Community {
     @NotNull
     private String description;
 
+    private long followerCount;
+
     public Community(String name, String description) {
         this.name = name;
         this.description = description;

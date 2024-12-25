@@ -7,4 +7,5 @@ public class CommunityDTO {
     private Long id;
     private String name;
     private String description;
+    private long followerCount;
 }

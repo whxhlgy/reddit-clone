@@ -14,4 +14,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 SELECT s FROM Subscription s WHERE s.user.username = :username
 """)
     List<Subscription> findAllWithCommunityByUserId(@Param("username") String username);
+
 }

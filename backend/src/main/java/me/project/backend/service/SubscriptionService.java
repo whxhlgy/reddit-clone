@@ -1,5 +1,6 @@
 package me.project.backend.service;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Community;
 import me.project.backend.domain.Subscription;
@@ -44,6 +45,7 @@ public class SubscriptionService {
         })).toList();
     }
 
+    @Transactional
     public SubscriptionDTO subscribe(String communityName) {
         String username = ContextUtil.getUsername().orElseThrow(() -> new ServiceRuntimeException("cannot get username"));
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
@@ -55,9 +57,16 @@ public class SubscriptionService {
         subscription.setCommunity(community);
         try {
             Subscription save = subscriptionRepository.save(subscription);
+            incrementFollowerCount(save.getCommunity().getId());
             return new SubscriptionDTO(save.getId(), save.getUser().getUsername(), save.getCommunity().getName());
         } catch (DataIntegrityViolationException e) {
             throw new SubscriptionAlreadyExistsException("you have already subscribed it");
         }
+    }
+
+    public void incrementFollowerCount(long community_id) {
+        Community community = communityRepository.findByIdForUpdate(community_id).orElseThrow(() -> new CommunityNotFoundException(String.valueOf(community_id)));
+        community.setFollowerCount(community.getFollowerCount() + 1);
+        communityRepository.save(community);
     }
 }
