@@ -22,4 +22,6 @@ public class PostDTO {
     private int reaction;
 
     private long likeCount;
+
+    private long viewCount;
 }

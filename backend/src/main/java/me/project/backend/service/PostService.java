@@ -14,10 +14,12 @@ import me.project.backend.repository.CommunityRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.repository.UserRepository;
 import me.project.backend.service.IService.ILikeService;
+import me.project.backend.util.RedisKeys;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,13 +34,15 @@ public class PostService {
     private final ILikeService likeService;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, ModelMapper mapper, ILikeService likeService, CommunityRepository communityRepository, UserRepository userRepository, StringRedisTemplate stringRedisTemplate) {
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.likeService = likeService;
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     public List<PostDTO> findAll() {
@@ -75,6 +79,7 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = principal.getUsername();
+        increaseViewCount(postId, username);
         return convertPostToDTOWithReactionAndLikeCount(username, post);
     }
 
@@ -93,6 +98,16 @@ public class PostService {
         dto.setReaction(likeService.getUserReactionByPostId(username, post.getId()));
         dto.setLikeCount(likeService.countLikeByPostId(post.getId()));
         dto.setUsername(post.getUser().getUsername());
+        dto.setViewCount(getViewCount(post.getId()));
         return dto;
+    }
+
+    private void increaseViewCount(long postId, String username) {
+        String key = RedisKeys.getPostViewKey(postId);
+        stringRedisTemplate.opsForHyperLogLog().add(key, username);
+    }
+    private long getViewCount(long postId) {
+        String key = RedisKeys.getPostViewKey(postId);
+        return stringRedisTemplate.opsForHyperLogLog().size(key);
     }
 }
