@@ -6,6 +6,7 @@ import me.project.backend.exception.ServiceRuntimeException;
 import me.project.backend.payload.dto.LikeDTO;
 import me.project.backend.payload.request.LikeRequest;
 import me.project.backend.service.IService.ILikeService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class LikeServiceUseCache implements ILikeService {
         return "dislike:" + type + ":" + id;
     }
 
-    public LikeServiceUseCache(StringRedisTemplate redisTemplate, RedisScript<Boolean> redisScript) {
+    public LikeServiceUseCache(StringRedisTemplate redisTemplate, @Qualifier("likeEntityScript") RedisScript<Boolean> redisScript) {
         this.redisTemplate = redisTemplate;
         this.redisScript = redisScript;
     }

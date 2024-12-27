@@ -78,7 +78,7 @@ public class PostService {
         post.setCommunity(community);
         post.setUser(user);
         Post save = postRepository.save(post);
-        feedService.savePostForFeed(community.getId(), post.getId());
+        feedService.savePostForFeed(community, post.getId());
         return mapper.map(save, PostDTO.class);
     }
 

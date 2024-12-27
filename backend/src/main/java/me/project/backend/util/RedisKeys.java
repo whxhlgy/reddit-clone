@@ -14,6 +14,6 @@ public class RedisKeys {
     }
 
     static public String getCommTimelineKey(String communityName) {
-        return "CommTimeline:" + communityName;
+        return "commTimeline:" + communityName;
     }
 }

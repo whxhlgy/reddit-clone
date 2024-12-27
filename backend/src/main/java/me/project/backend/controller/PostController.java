@@ -40,6 +40,7 @@ public class PostController {
         return postService.saveByCommunityName(name, postRequest);
     }
 
+    @Deprecated
     @PostMapping
     public PostDTO save(@RequestBody Post post) {
         return postService.save(post);

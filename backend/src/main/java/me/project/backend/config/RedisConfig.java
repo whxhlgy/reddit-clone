@@ -17,8 +17,14 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisScript<Boolean> redisScript() {
+    public RedisScript<Boolean> likeEntityScript() {
         ClassPathResource classPathResource = new ClassPathResource("likeEntity.lua");
+        return RedisScript.of(classPathResource, Boolean.class);
+    }
+
+    @Bean
+    public RedisScript<Boolean> fetchNewsScript() {
+        ClassPathResource classPathResource = new ClassPathResource("fetchNewsInCommunity.lua");
         return RedisScript.of(classPathResource, Boolean.class);
     }
 }
