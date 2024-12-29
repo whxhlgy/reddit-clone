@@ -1,9 +1,7 @@
 package me.project.backend.controller;
 
-import me.project.backend.domain.Subscription;
 import me.project.backend.payload.dto.SubscriptionDTO;
 import me.project.backend.service.SubscriptionService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +15,7 @@ public class SubscriptionController {
     }
 
     @PostMapping("/{communityName}")
-    public SubscriptionDTO addSubscription(@PathVariable String communityName){
+    public SubscriptionDTO addSubscription(@PathVariable String communityName) {
         return subscriptionService.subscribe(communityName);
     }
 }
