@@ -3,10 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout, { loader as headerLoader } from "@/app/layout";
 import Home from "@/app/home";
 import "./App.css";
-import CommunityHome, {
-  action as feedAction,
-  loader as feedLoader,
-} from "@/app/community/home";
+import CommunityHome, { action as feedAction } from "@/app/community/home";
 import ErrorPage from "@/app/error-page";
 import Submit, { loader as feedSubmitLoader } from "@/app/community/submit";
 import { action as loginAction, default as LoginPage } from "@/app/auth/login";
@@ -61,7 +58,6 @@ const router = createBrowserRouter([
                   {
                     path: "r/:communityName",
                     action: feedAction,
-                    loader: feedLoader,
                     element: <CommunityHome />,
                   },
                   {

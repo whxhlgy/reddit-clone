@@ -1,27 +1,35 @@
 import { getPostByCommunityName } from "@/api/post";
 import PostCard from "@/components/post-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
 
-const Feed = ({ posts: _posts }) => {
-  const [posts, setPosts] = useState(_posts);
-  const [page, setPage] = useState(1);
+const Feed = () => {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const { communityName } = useParams();
   const fetchMorePosts = async () => {
-    const newPosts = await getPostByCommunityName(communityName, {
+    const postData = await getPostByCommunityName(communityName, {
       page,
       size: 10,
     });
-    setPage(page + 1);
+    const newPosts = postData.data;
+    const pagination = postData.pagination;
+    setPage(pagination.page + 1);
+    setHasMore(pagination.page < pagination.totalPages - 1);
     setPosts([...posts, ...newPosts]);
   };
+
+  useEffect(() => {
+    fetchMorePosts();
+  }, []);
 
   return (
     <InfiniteScroll
       dataLength={posts.length}
       next={fetchMorePosts}
-      hasMore={true}
+      hasMore={hasMore}
       loader={<p>Loading...</p>}
     >
       {posts.map((post, index) => (

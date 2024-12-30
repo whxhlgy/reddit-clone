@@ -5,17 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link, useLoaderData } from "react-router-dom";
 
-export function loader({ params, request }) {
-  const url = new URL(request.url);
-  const page = url.searchParams.get("page");
-  const size = url.searchParams.get("size");
-  console.debug(
-    `fetch post page: ${url.searchParams.get("page")}, size: ${url.searchParams.get("size")}`,
-  );
-  const { communityName } = params;
-  const posts = getPostByCommunityName(communityName, { page, size });
-  return posts;
-}
+// export function loader({ params, request }) {
+//   const url = new URL(request.url);
+//   const page = url.searchParams.get("page");
+//   const size = url.searchParams.get("size");
+//   console.debug(
+//     `fetch post page: ${url.searchParams.get("page")}, size: ${url.searchParams.get("size")}`,
+//   );
+//   const { communityName } = params;
+//   const posts = getPostByCommunityName(communityName, { page, size });
+//   return posts;
+// }
 
 export async function action({ params, request }) {
   const data = Object.fromEntries(await request.formData());
@@ -44,7 +44,6 @@ export async function action({ params, request }) {
 }
 
 const Home = () => {
-  const posts = useLoaderData();
   return (
     <div className="flex flex-col gap-2">
       {/* header */}
@@ -58,7 +57,7 @@ const Home = () => {
       </div>
       {/* main content */}
       <div>
-        <Feed posts={posts} />
+        <Feed />
       </div>
     </div>
   );

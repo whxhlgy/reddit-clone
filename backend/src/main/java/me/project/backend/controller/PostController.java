@@ -1,12 +1,19 @@
 package me.project.backend.controller;
 
-import me.project.backend.domain.Post;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.payload.request.PostRequest;
+import me.project.backend.payload.response.FindPostsResponse;
 import me.project.backend.service.PostService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
@@ -24,9 +31,9 @@ public class PostController {
     }
 
     @GetMapping("/community/{name}")
-    public List<PostDTO> findAllByCommunity(@PathVariable String name,
-                                            @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "10") int size) {
+    public FindPostsResponse findAllByCommunity(@PathVariable String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return postService.findAllByCommunityName(name, page, size);
     }
 
@@ -38,11 +45,5 @@ public class PostController {
     @PostMapping("/community/{name}")
     public PostDTO saveByCommunityName(@PathVariable String name, @RequestBody PostRequest postRequest) {
         return postService.saveByCommunityName(name, postRequest);
-    }
-
-    @Deprecated
-    @PostMapping
-    public PostDTO save(@RequestBody Post post) {
-        return postService.save(post);
     }
 }
