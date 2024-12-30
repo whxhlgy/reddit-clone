@@ -26,13 +26,13 @@ import {
 import { COMMUNITY_URL } from "@/lib/consts";
 import { ChevronDown, Home, Plus, Telescope, Users } from "lucide-react";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/home",
     icon: Home,
   },
   {
@@ -82,7 +82,10 @@ export default function AppSidebar({ communities }) {
                   {communities.map((community) => (
                     <SidebarMenuItem key={community.name}>
                       <SidebarMenuButton asChild>
-                        <Link to={"/" + COMMUNITY_URL + "/" + community.name}>
+                        <Link
+                          to={"/" + COMMUNITY_URL + "/" + community.name}
+                          reloadDocument={true}
+                        >
                           <span>{community.name}</span>
                         </Link>
                       </SidebarMenuButton>

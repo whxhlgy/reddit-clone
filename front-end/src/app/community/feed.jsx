@@ -22,6 +22,7 @@ const Feed = () => {
   };
 
   useEffect(() => {
+    console.log("hello");
     fetchMorePosts();
   }, []);
 

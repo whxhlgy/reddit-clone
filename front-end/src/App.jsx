@@ -18,6 +18,7 @@ import CommentsIndex, {
   loader as commentLoader,
 } from "@/app/comment";
 import { action as signupAction, SignUpForm } from "@/components/signup-form";
+import UserFeed from "@/app/timeline/user-feed";
 
 const router = createBrowserRouter([
   {
