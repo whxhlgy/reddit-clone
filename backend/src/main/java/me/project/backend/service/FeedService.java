@@ -2,7 +2,6 @@ package me.project.backend.service;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,6 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.connection.stream.StringRecord;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
@@ -54,8 +52,7 @@ public class FeedService {
     private final String POST_ID_FIELD;
     private final String POST_COMM_FIELD;
     private final int CONSUME_TIME_OUT;
-    private final Runnable savePostTask;
-    private final TaskExecutor taskExecutor;
+    private final long UPDATE_TIMELINE_INTERVAL = 1000 * 60;
 
     @PostConstruct
     @SuppressWarnings("unchecked")
@@ -110,9 +107,6 @@ public class FeedService {
         this.POST_ID_FIELD = "id";
         this.POST_COMM_FIELD = "communityId";
         this.CONSUME_TIME_OUT = 1000;
-        this.taskExecutor = taskExecutor;
-        this.savePostTask = () -> {
-        };
 
     }
 
@@ -120,15 +114,22 @@ public class FeedService {
         int start = page * size;
         int end = start + size - 1;
 
-        List<Community> communities = subscriptionRepository.findAllWithCommunityByUserId(username).stream()
-                .map(Subscription::getCommunity).toList();
-        for (Community community : communities) {
-            if (community.getFollowerCount() > FAN_OUT_MAX) {
-                log.debug("find popular community: {}", community.getName());
-                String commKey = RedisKeys.getCommTimelineKey(community.getName());
-                String userKey = RedisKeys.getTimelineKey(username);
-                stringRedisTemplate.execute(fetchNewsScript, List.of(commKey, userKey));
+        String lastUpdated = stringRedisTemplate.opsForValue().get(RedisKeys.getTimeLineLastUpdated(username));
+        if (lastUpdated == null || System.currentTimeMillis() - Long.valueOf(lastUpdated) > UPDATE_TIMELINE_INTERVAL) {
+
+            List<Community> communities = subscriptionRepository.findAllWithCommunityByUserId(username).stream()
+                    .map(Subscription::getCommunity).toList();
+            for (Community community : communities) {
+                if (community.getFollowerCount() > FAN_OUT_MAX) {
+                    log.debug("find popular community: {}", community.getName());
+                    String commKey = RedisKeys.getCommTimelineKey(community.getName());
+                    String userKey = RedisKeys.getTimelineKey(username);
+                    stringRedisTemplate.execute(fetchNewsScript, List.of(commKey, userKey));
+                }
             }
+
+            stringRedisTemplate.opsForValue().set(RedisKeys.getTimeLineLastUpdated(username),
+                    String.valueOf(System.currentTimeMillis()));
         }
 
         Set<String> idStrings = stringRedisTemplate.opsForZSet().reverseRange(RedisKeys.getTimelineKey(username), start,

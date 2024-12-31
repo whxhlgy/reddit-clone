@@ -1,11 +1,11 @@
 package me.project.backend.util;
 
 public class RedisKeys {
-    static public String getPostViewKey(long postId){
+    static public String getPostViewKey(long postId) {
         return "view:post:" + postId;
     }
 
-    static public String getPostKey(long postId){
+    static public String getPostKey(long postId) {
         return "cache:post:" + postId;
     }
 
@@ -15,5 +15,9 @@ public class RedisKeys {
 
     static public String getCommTimelineKey(String communityName) {
         return "commTimeline:" + communityName;
+    }
+
+    static public String getTimeLineLastUpdated(String username) {
+        return "feed:lastUpdate:" + username;
     }
 }
