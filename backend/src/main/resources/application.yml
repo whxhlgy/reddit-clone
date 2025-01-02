@@ -1,12 +1,12 @@
 spring:
   #  autoconfigure:
-#    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+  #    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   application:
     name: reddit-backend
   datasource:
-    url: 'jdbc:mysql://mysql/reddit'
-    username: 'root'
-    password: 'root'
+    url: "jdbc:mysql://mysql/reddit"
+    username: "root"
+    password: "root"
   jpa:
     open-in-view: false
     hibernate:
@@ -28,6 +28,7 @@ logging:
     org:
       springframework:
         security: DEBUG
+        transaction: DEBUG
         web: DEBUG
 junjiezh:
   app:
@@ -37,3 +38,4 @@ junjiezh:
 server:
   servlet:
     context-path: /api
+

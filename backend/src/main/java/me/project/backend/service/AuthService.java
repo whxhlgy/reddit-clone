@@ -2,6 +2,7 @@ package me.project.backend.service;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import me.project.backend.domain.Feed;
 import me.project.backend.domain.User;
 import me.project.backend.exception.auth.BadJwtTokenException;
 import me.project.backend.exception.auth.InvalidCredentialsException;
@@ -42,8 +43,7 @@ public class AuthService {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException();
@@ -59,12 +59,17 @@ public class AuthService {
      * 1. check if the user already exist
      * 2. save the user
      * 3. reuse the login method
+     * 
      * @param signupRequest
      * @return
      */
     public LoginResponse signup(@Valid SignupRequest signupRequest) {
         try {
-            userService.save(User.builder().username(signupRequest.getUsername()).password(signupRequest.getPassword()).build());
+            Feed feed = new Feed();
+            User user = User.builder().username(signupRequest.getUsername()).password(signupRequest.getPassword())
+                    .build();
+            user.setFeed(feed);
+            userService.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyExistsException("The username: " + signupRequest.getUsername() + " already exists");
         }
@@ -82,7 +87,8 @@ public class AuthService {
 
         String username = jwtService.extractUsername(refreshToken);
         // this is a token with isAuthenticated()==true
-        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl(username, null), null, List.of());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl(username, null),
+                null, List.of());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtService.generateJwtToken(authentication);
     }
@@ -91,7 +97,8 @@ public class AuthService {
      * return two expired jwt token
      */
     public SignOutResponse signOut() {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl("anonymous", null), null, List.of());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new UserDetailsImpl("anonymous", null),
+                null, List.of());
         String jwtToken = jwtService.generateJwtToken(authentication, Date.from(Instant.now()));
         return new SignOutResponse(jwtToken, jwtToken, "Sign out");
     }

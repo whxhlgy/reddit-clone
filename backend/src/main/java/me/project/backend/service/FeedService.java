@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -22,14 +24,20 @@ import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import me.project.backend.domain.Community;
+import me.project.backend.domain.Feed;
 import me.project.backend.domain.Post;
 import me.project.backend.domain.Subscription;
 import me.project.backend.domain.User;
+import me.project.backend.exception.notFound.PostNotFoundException;
 import me.project.backend.payload.dto.PostDTO;
+import me.project.backend.repository.FeedRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.repository.SubscriptionRepository;
 import me.project.backend.service.IService.ILikeService;
@@ -41,6 +49,7 @@ public class FeedService {
     private final SubscriptionRepository subscriptionRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final PostRepository postRepository;
+    private final FeedRepository feedRepository;
     private final ILikeService likeService;
     private final ModelMapper mapper;
     private final PostCacheService postCacheService;
@@ -53,6 +62,7 @@ public class FeedService {
     private final String POST_COMM_FIELD;
     private final int CONSUME_TIME_OUT;
     private final long UPDATE_TIMELINE_INTERVAL = 1000 * 60;
+    private final TransactionHandler transactionHandler;
 
     @PostConstruct
     @SuppressWarnings("unchecked")
@@ -64,6 +74,7 @@ public class FeedService {
         }
         Thread taskFetcher = new Thread(() -> {
             while (true) {
+                // get the task with postId and communityId
                 StreamOffset<String> streamOffset = StreamOffset.create(STREAM_KEY, ReadOffset.lastConsumed());
                 List<MapRecord<String, Object, Object>> records = stringRedisTemplate.opsForStream().read(
                         Consumer.from(GROUP_NAME, CUSTOMER_NAME),
@@ -75,11 +86,23 @@ public class FeedService {
                 MapRecord<String, Object, Object> record = records.get(0);
                 Long postId = Long.valueOf((String) record.getValue().get(POST_ID_FIELD));
                 Long communityId = Long.valueOf((String) record.getValue().get(POST_COMM_FIELD));
-                List<Subscription> subs = subscriptionRepository.findAllByCommunityId(communityId);
-                List<User> users = subs.stream().map(Subscription::getUser).toList();
-                users.forEach((user -> {
-                    savePostInUserTimeline(user.getUsername(), postId);
-                }));
+                log.debug("get task of save post for feed, postId: {}, communityId: {}", postId, communityId);
+
+                transactionHandler.runInTransaction(() -> {
+                    log.debug("should start a new session: {}", TransactionAspectSupport.currentTransactionStatus());
+                    Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+                    List<Subscription> subs = subscriptionRepository.findAllByCommunityId(communityId);
+                    List<User> users = subs.stream().map(Subscription::getUser).toList();
+                    users.forEach((user -> {
+                        Long userId = user.getId();
+                        log.debug("save a post: {} in {} feed", post.getId(), userId);
+                        Feed feed = feedRepository.findByUserId(userId);
+                        feed.addPost(post);
+                    }));
+                    return true;
+                });
+
+                // start task(intensive)
                 stringRedisTemplate.opsForStream().acknowledge(GROUP_NAME, record);
                 log.debug("opeartion success, postId: {}, communityId: {}", postId, communityId);
             }
@@ -89,11 +112,11 @@ public class FeedService {
     }
 
     public FeedService(SubscriptionRepository subscriptionRepository, StringRedisTemplate stringRedisTemplate,
-            PostRepository postRepository, ILikeService likeService, ModelMapper mapper,
-            PostCacheService postCacheService,
-            TaskExecutor taskExecutor,
-            @Qualifier("fetchNewsScript") RedisScript<Boolean> fetchNewsScript) {
-        this.FAN_OUT_MAX = 2;
+                       PostRepository postRepository, ILikeService likeService, ModelMapper mapper,
+                       PostCacheService postCacheService,
+                       @Qualifier("fetchNewsScript") RedisScript<Boolean> fetchNewsScript,
+                       FeedRepository feedRepository, TransactionHandler transactionHandler) {
+        this.FAN_OUT_MAX = 100;
         this.STREAM_KEY = "stream:post2save";
         this.GROUP_NAME = "threads";
         this.CUSTOMER_NAME = "thread1";
@@ -107,7 +130,8 @@ public class FeedService {
         this.POST_ID_FIELD = "id";
         this.POST_COMM_FIELD = "communityId";
         this.CONSUME_TIME_OUT = 1000;
-
+        this.feedRepository = feedRepository;
+        this.transactionHandler = transactionHandler;
     }
 
     public List<PostDTO> getUserTimeLine(String username, int page, int size) {
@@ -146,8 +170,7 @@ public class FeedService {
 
     public void savePostForFeed(Community community, long postId) {
         if (community.getFollowerCount() > FAN_OUT_MAX) {
-            log.debug("find popular community: {}, saved to itself timeline", community.getName());
-            savePostInCommTimeline(community, postId);
+            log.debug("find popular community, use pull-strategy instead");
             return;
         }
         // slow operation, do it asynchroniously
@@ -156,12 +179,6 @@ public class FeedService {
                 POST_COMM_FIELD, String.valueOf(community.getId()));
         MapRecord<String, String, String> mapBacked = StreamRecords.mapBacked(fields).withStreamKey(STREAM_KEY);
         stringRedisTemplate.opsForStream().add(mapBacked);
-    }
-
-    public void savePostInUserTimeline(String username, long postId) {
-        log.debug("save a post: {} in {} timeline", postId, username);
-        stringRedisTemplate.opsForZSet().add(RedisKeys.getTimelineKey(username), String.valueOf(postId),
-                System.currentTimeMillis());
     }
 
     public void savePostInCommTimeline(Community community, long postId) {
