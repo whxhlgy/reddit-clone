@@ -22,4 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = { "user" })
     @Query("SELECT p FROM Post p WHERE p.id IN :ids")
     List<Post> findAllInIds(@Param("ids") List<Long> ids);
+
+    List<Post> findTop50ByCommunityNameOrderByCreatedAtDesc(String communityName);
+
 }

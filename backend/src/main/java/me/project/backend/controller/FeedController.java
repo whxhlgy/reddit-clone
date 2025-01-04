@@ -1,6 +1,7 @@
 package me.project.backend.controller;
 
 import me.project.backend.payload.dto.PostDTO;
+import me.project.backend.payload.response.PaginatedResponse;
 import me.project.backend.service.FeedService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,8 @@ public class FeedController {
     }
 
     @GetMapping("/timeline/{username}")
-    public List<PostDTO> timeline(@PathVariable String username, @RequestParam int page, @RequestParam int size) {
+    public PaginatedResponse<PostDTO> timeline(@PathVariable String username, @RequestParam int page,
+            @RequestParam int size) {
         return feedService.getUserTimeLine(username, page, size);
     }
 }

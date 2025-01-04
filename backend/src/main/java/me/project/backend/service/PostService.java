@@ -25,6 +25,7 @@ import me.project.backend.payload.UserDetailsImpl;
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.payload.request.PostRequest;
 import me.project.backend.payload.response.FindPostsResponse;
+import me.project.backend.payload.response.PaginatedResponse;
 import me.project.backend.repository.CommunityRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.repository.UserRepository;
@@ -107,7 +108,7 @@ public class PostService {
         return convertPostToDTOWithReactionAndLikeCount(username, post);
     }
 
-    public FindPostsResponse findAllByCommunityName(String name, int page, int size) {
+    public PaginatedResponse<PostDTO> findAllByCommunityName(String name, int page, int size) {
         log.debug("find all posts by community name: {}, page: {}, size: {}", name, page, size);
 
         Pageable pageable = PageRequest.of(page, size);
@@ -115,10 +116,9 @@ public class PostService {
         UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         String username = principal.getUsername();
-        List<PostDTO> postDTOs = posts.stream().map(post -> convertPostToDTOWithReactionAndLikeCount(username, post))
-                .collect(Collectors.toList());
-        return new FindPostsResponse(postDTOs, new PaginationInfo(posts.getNumber(), posts.getSize(),
-                posts.getTotalPages(), posts.getTotalElements()));
+
+        Page<PostDTO> postDTOs = posts.map(post -> convertPostToDTOWithReactionAndLikeCount(username, post));
+        return new PaginatedResponse<>(postDTOs);
     }
 
     private PostDTO convertPostToDTOWithReactionAndLikeCount(String username, Post post) {

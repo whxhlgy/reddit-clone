@@ -2,6 +2,7 @@ package me.project.backend.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -30,7 +31,7 @@ public class Feed {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "feed_post")
-    private List<Post> posts;
+    private Set<Post> posts;
 
     public void addPost(Post post) {
         post.getFeeds().add(this);

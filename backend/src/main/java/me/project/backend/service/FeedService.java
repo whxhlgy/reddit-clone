@@ -1,20 +1,16 @@
 package me.project.backend.service;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
@@ -25,7 +21,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -36,10 +31,13 @@ import me.project.backend.domain.Post;
 import me.project.backend.domain.Subscription;
 import me.project.backend.domain.User;
 import me.project.backend.exception.notFound.PostNotFoundException;
+import me.project.backend.exception.notFound.UserNotFoundException;
 import me.project.backend.payload.dto.PostDTO;
+import me.project.backend.payload.response.PaginatedResponse;
 import me.project.backend.repository.FeedRepository;
 import me.project.backend.repository.PostRepository;
 import me.project.backend.repository.SubscriptionRepository;
+import me.project.backend.repository.UserRepository;
 import me.project.backend.service.IService.ILikeService;
 import me.project.backend.util.RedisKeys;
 
@@ -49,6 +47,7 @@ public class FeedService {
     private final SubscriptionRepository subscriptionRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final FeedRepository feedRepository;
     private final ILikeService likeService;
     private final ModelMapper mapper;
@@ -112,11 +111,12 @@ public class FeedService {
     }
 
     public FeedService(SubscriptionRepository subscriptionRepository, StringRedisTemplate stringRedisTemplate,
-                       PostRepository postRepository, ILikeService likeService, ModelMapper mapper,
-                       PostCacheService postCacheService,
-                       @Qualifier("fetchNewsScript") RedisScript<Boolean> fetchNewsScript,
-                       FeedRepository feedRepository, TransactionHandler transactionHandler) {
-        this.FAN_OUT_MAX = 100;
+            PostRepository postRepository, ILikeService likeService, ModelMapper mapper,
+            PostCacheService postCacheService,
+            @Qualifier("fetchNewsScript") RedisScript<Boolean> fetchNewsScript,
+            UserRepository userRepository,
+            FeedRepository feedRepository, TransactionHandler transactionHandler) {
+        this.FAN_OUT_MAX = 0;
         this.STREAM_KEY = "stream:post2save";
         this.GROUP_NAME = "threads";
         this.CUSTOMER_NAME = "thread1";
@@ -132,40 +132,42 @@ public class FeedService {
         this.CONSUME_TIME_OUT = 1000;
         this.feedRepository = feedRepository;
         this.transactionHandler = transactionHandler;
+        this.userRepository = userRepository;
     }
 
-    public List<PostDTO> getUserTimeLine(String username, int page, int size) {
-        int start = page * size;
-        int end = start + size - 1;
+    @Transactional
+    public PaginatedResponse<PostDTO> getUserTimeLine(String username, int page, int size) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
-        String lastUpdated = stringRedisTemplate.opsForValue().get(RedisKeys.getTimeLineLastUpdated(username));
-        if (lastUpdated == null || System.currentTimeMillis() - Long.valueOf(lastUpdated) > UPDATE_TIMELINE_INTERVAL) {
-
+        // very time-consuming operation, limit its frequency
+        String lastUpdatedString = stringRedisTemplate.opsForValue().get(RedisKeys.getTimeLineLastUpdated(username));
+        if (lastUpdatedString == null
+                || Instant.now().isAfter(Instant.parse(lastUpdatedString).plus(1, ChronoUnit.MINUTES))) {
             List<Community> communities = subscriptionRepository.findAllWithCommunityByUserId(username).stream()
                     .map(Subscription::getCommunity).toList();
             for (Community community : communities) {
                 if (community.getFollowerCount() > FAN_OUT_MAX) {
-                    log.debug("find popular community: {}", community.getName());
-                    String commKey = RedisKeys.getCommTimelineKey(community.getName());
-                    String userKey = RedisKeys.getTimelineKey(username);
-                    stringRedisTemplate.execute(fetchNewsScript, List.of(commKey, userKey));
+                    log.debug("find popular community: {}, mannually load feed", community.getName());
+                    fetchUserFeedByCommunity(user, community);
                 }
             }
-
             stringRedisTemplate.opsForValue().set(RedisKeys.getTimeLineLastUpdated(username),
-                    String.valueOf(System.currentTimeMillis()));
+                    Instant.now().toString());
         }
 
-        Set<String> idStrings = stringRedisTemplate.opsForZSet().reverseRange(RedisKeys.getTimelineKey(username), start,
-                end);
-        if (idStrings == null || idStrings.isEmpty()) {
-            return new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Post> posts = feedRepository.findPostsByUsername(user.getUsername(), pageRequest);
+        Page<PostDTO> postDTOs = posts.map(post -> convertPostToDTOWithReactionAndLikeCount(username, post));
+
+        return new PaginatedResponse<>(postDTOs);
+    }
+
+    public void fetchUserFeedByCommunity(User user, Community community) {
+        List<Post> posts = postRepository.findTop50ByCommunityNameOrderByCreatedAtDesc(community.getName());
+        for (Post post : posts) {
+            Feed feed = user.getFeed();
+            feed.addPost(post);
         }
-        List<Long> ids = idStrings.stream().map(Long::parseLong).toList();
-        List<Post> posts = postRepository.findAllInIds(ids);
-        Collections.reverse(posts);
-        return posts.stream().map(post -> convertPostToDTOWithReactionAndLikeCount(username, post))
-                .collect(Collectors.toList());
     }
 
     public void savePostForFeed(Community community, long postId) {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.project.backend.payload.dto.PostDTO;
 import me.project.backend.payload.request.PostRequest;
-import me.project.backend.payload.response.FindPostsResponse;
+import me.project.backend.payload.response.PaginatedResponse;
 import me.project.backend.service.PostService;
 
 @RestController
@@ -31,7 +31,7 @@ public class PostController {
     }
 
     @GetMapping("/community/{name}")
-    public FindPostsResponse findAllByCommunity(@PathVariable String name,
+    public PaginatedResponse<PostDTO> findAllByCommunity(@PathVariable String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return postService.findAllByCommunityName(name, page, size);
